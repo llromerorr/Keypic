@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "generatedAt": "2025-08-19T19:24:39.339Z",
+  "base": {
+    "photos": "./photos/",
+    "thumbs": "./thumbs/"
+  },
+  "albums": [
+    {
+      "id": "123456789",
+      "cover": "IMG_9281.JPG",
+      "count": 11,
+      "files": [
+        "IMG_9281.JPG",
+        "IMG_9283.JPG",
+        "IMG_9284.JPG",
+        "IMG_9285.JPG",
+        "IMG_9286.JPG",
+        "IMG_9287.JPG",
+        "IMG_9288.JPG",
+        "IMG_9289.JPG",
+        "IMG_9290.JPG",
+        "IMG_9292.JPG",
+        "IMG_9293.JPG"
+      ]
+    },
+    {
+      "id": "123456788",
+      "cover": "IMG_9295.JPG",
+      "count": 19,
+      "files": [
+        "IMG_9295.JPG",
+        "IMG_9298.JPG",
+        "IMG_9299.JPG",
+        "IMG_9301.JPG",
+        "IMG_9303.JPG",
+        "IMG_9304.JPG",
+        "IMG_9306.JPG",
+        "IMG_9308.JPG",
+        "IMG_9310.JPG",
+        "IMG_9311.JPG",
+        "IMG_9312.JPG",
+        "IMG_9313.JPG",
+        "IMG_9314.JPG",
+        "IMG_9315.JPG",
+        "IMG_9316.JPG",
+        "IMG_9317.JPG",
+        "IMG_9319.JPG",
+        "IMG_9320.JPG",
+        "IMG_9321.JPG"
+      ]
+    }
+  ]
+}

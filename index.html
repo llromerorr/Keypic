@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>FotoID — Búsqueda por cédula</title>
+  <meta name="theme-color" content="#0b57d0">
+  <style>
+    :root{
+      --bg:#f7f9fc;
+      --surface:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --brand:#0b57d0;
+      --brand-2:#0847ac;
+      --border:#e5e7eb;
+      --radius:14px;
+      --shadow:0 8px 30px rgba(2,6,23,0.08);
+      --focus:0 0 0 3px rgba(11,87,208,.18);
+      color-scheme: light;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    img{image-orientation:from-image; display:block; max-width:100%}
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:clamp(12px,3vw,20px)}
+    .center{display:grid;place-items:center}
+    .hidden{display:none !important}
+
+    /* Pantalla 1: solo buscador, con collage de fondo */
+    .screen{min-height:100dvh; display:grid; grid-template-rows: 1fr; position:relative; overflow:hidden}
+    .bg-collage{
+      position:absolute; inset:0; z-index:0;
+      display:grid; grid-template-columns: repeat(6, 1fr); gap:5px; padding:5px;
+      filter:saturate(1.05) blur(0.5px);
+      opacity:0.9;
+      pointer-events:none;
+    }
+    .bg-collage img{
+      width:100%; height:100%;
+      object-fit:cover; border-radius:10px; background:#eaeef6;
+    }
+    .bg-scrim{
+      position:absolute; inset:0; z-index:0;
+      background:
+        radial-gradient(1200px 600px at 40% -10%, rgba(11,87,208,.20), transparent 60%),
+        radial-gradient(1000px 600px at 100% 0%, rgba(11,87,208,.18), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.88));
+      pointer-events:none;
+    }
+    @media (max-width: 768px){
+      .bg-collage{grid-template-columns: repeat(4, 1fr)}
+    }
+
+    .search-card{
+      width:min(720px, 92vw);
+      background:var(--surface);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      border-radius:24px;
+      padding:22px;
+      z-index:1;
+    }
+    .app-title{
+      display:flex;align-items:center;gap:10px;
+      font-weight:800;font-size:18px;color:var(--text);margin-bottom:10px;letter-spacing:.2px
+    }
+    .app-dot{width:10px;height:10px;border-radius:50%;background:var(--brand)}
+    .hint{color:var(--muted);font-size:14px;margin:2px 0 16px}
+
+    .field{
+      position:relative;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px; align-items:center;
+    }
+    .input{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px 14px 14px 44px;
+      outline:0;font-size:16px;background:var(--surface);color:var(--text);
+      box-shadow: 0 1px 0 rgba(2,6,23,0.02) inset;
+    }
+    .input:focus{box-shadow:var(--focus);border-color:transparent}
+    .ic-left{
+      position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted)
+    }
+    .btn{
+      border:0; background:#e8efff; color:#0b57d0;
+      font-weight:700; letter-spacing:.2px;
+      padding:12px 14px;border-radius:12px;cursor:pointer;display:inline-grid;grid-auto-flow:column;gap:8px;align-items:center;
+    }
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.primary:hover{background:var(--brand-2)}
+    .btn.tonal{background:#e8efff;color:#0b57d0}
+    .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.26)}
+    .btn.icon{padding:10px; border-radius:10px; min-width:40px; min-height:40px}
+    .btn:focus-visible{outline:var(--focus)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .ic{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Pantalla 2: collage + bottom app bar */
+    .bar-top{
+      position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.86) 100%);
+      backdrop-filter:saturate(1.2) blur(6px);
+      border-bottom:1px solid var(--border);
+    }
+    .bar-top .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0}
+    .title{font-weight:800;letter-spacing:.2px;font-size:18px;color:var(--text)}
+    .subtitle{color:var(--muted);font-size:13px}
+    .grid{
+      display:grid; gap:10px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      padding:14px 0 90px;
+    }
+    .card{
+      position:relative;border-radius:14px;overflow:hidden;
+      border:1px solid var(--border); background:#fff; cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .card:hover{transform:translateY(-2px)}
+    .card img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#f1f5f9}
+    .pick{
+      position:absolute;top:8px;right:8px; z-index:2;
+      width:30px;height:30px;border-radius:999px;display:grid;place-items:center;
+      background:rgba(255,255,255,.96); color:#0b57d0; border:1px solid var(--border);
+      box-shadow:var(--shadow)
+    }
+    .card[data-picked="true"]{outline:3px solid #dbe8ff;outline-offset:-3px}
+    .chip{
+      position:absolute; bottom:8px; right:8px; z-index:2;
+      background:#0b57d0;color:#fff;font-weight:800;font-size:12px;border-radius:999px;padding:4px 8px;display:none
+    }
+    .card[data-picked="true"] .chip{display:inline-block}
+    .empty{color:var(--muted);text-align:center;padding:28px 0}
+
+    .bottom-bar{
+      position:fixed;left:0;right:0;bottom:0;z-index:20;
+      display:flex;align-items:center;justify-content:center;
+      padding:10px 14px;
+      background:linear-gradient(0deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.82) 100%);
+      backdrop-filter:saturate(1.2) blur(8px);
+      border-top:1px solid var(--border);
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+    .bottom-inner{
+      width:100%;max-width:1100px;display:flex;align-items:center;gap:12px;justify-content:space-between;
+    }
+    .sel-info{font-weight:700;color:var(--text)}
+    .muted{color:var(--muted)}
+
+    /* Pantalla de enlace (solo ver selección + descargar) */
+    .link-head{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 8px;
+      border-bottom:1px solid var(--border)
+    }
+    .link-title{font-size:18px;font-weight:800}
+    .link-note{color:var(--muted);font-size:13px}
+
+    /* Visor (lightbox) */
+    .overlay{
+      position:fixed; inset:0; z-index:100; display:none;
+      background: rgba(15,23,42,.92);
+    }
+    .overlay.show{display:grid; grid-template-rows:auto 1fr auto}
+    .v-head{
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px;
+      padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
+      background:rgba(255,255,255,.06); backdrop-filter: blur(6px);
+      color:#fff;
+    }
+    .v-pos{
+      color:#fff; font-weight:800; text-align:center;
+      min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .v-stage{
+      min-height:0; display:flex; align-items:center; justify-content:center;
+      position:relative; padding:10px;
+    }
+    .v-stage img{
+      max-width:100%; max-height:100%;
+      width:auto; height:auto; object-fit:contain; border-radius:12px; background:#0b0f1a;
+      box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+    /* Flechas laterales (solo desktop) */
+    .nav{
+      position:absolute; top:50%; transform:translateY(-50%);
+      width:44px;height:44px;border-radius:999px;display:grid;place-items:center;
+      background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.25);
+      cursor:pointer;
+    }
+    .nav:hover{background:rgba(255,255,255,.20)}
+    .nav-left{left:14px}
+    .nav-right{right:14px}
+
+    /* Pie del visor (siempre visible en móvil) */
+    .v-foot{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+      background:rgba(255,255,255,.06); backdrop-filter: blur(6px);
+      color:#fff;
+    }
+    .v-pill{
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.24);
+      color:#fff; font-weight:800; border-radius:999px; padding:6px 10px; min-width: fit-content;
+    }
+    .v-foot .btn{background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.22)}
+    .v-foot .btn:focus-visible{outline:2px solid rgba(255,255,255,.5)}
+
+    @media (max-width:768px){
+      .nav{display:none} /* usamos la barra inferior en móvil */
+    }
+
+    /* Toast */
+    .toast{
+      position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+      background:#0f172a;color:#fff;padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);
+      opacity:0;transition:opacity .2s;z-index:200;display:none;font-weight:600
+    }
+
+    @media (max-width:768px){
+      .grid{grid-template-columns: repeat(2, 1fr)}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *{animation-duration:.01ms !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+    }
+
+    /* ========= Mejoras de selección + caja de enlace ========= */
+
+    /* Estado activo del botón seleccionar (grid + visor) */
+    .pick[aria-pressed="true"],
+    #vPick[aria-pressed="true"]{
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    /* Badge en el visor cuando la foto está seleccionada */
+    .v-selected-badge{
+      position:absolute; top:12px; right:12px; z-index:3;
+      background:#0b57d0; color:#fff; font-weight:800; font-size:12px;
+      border-radius:999px; padding:4px 8px; display:none;
+    }
+    .v-stage[data-picked="true"] .v-selected-badge{ display:inline-block }
+
+    /* Caja para mostrar el enlace compartible */
+    .bottom-inner{ flex-wrap:wrap }
+    .link-out{
+      display:flex; align-items:center; gap:8px;
+      background:#f5f7ff; border:1px solid var(--border);
+      padding:8px 10px; border-radius:12px; max-width:100%;
+    }
+    .link-out input{
+      flex:1; min-width:0; border:0; background:transparent;
+      font-size:13px; color:var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen 1: Solo buscador con fondo -->
+  <section id="screen-home" class="screen center">
+    <div id="bgCollage" class="bg-collage" aria-hidden="true"></div>
+    <div class="bg-scrim" aria-hidden="true"></div>
+
+    <div class="search-card">
+      <div class="app-title"><span class="app-dot"></span> FotoID</div>
+      <div class="hint">Busca por cédula para ver tus fotos y seleccionarlas.</div>
+      <div class="field">
+        <span class="ic-left">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <input id="q" class="input" inputmode="numeric" pattern="\d*" placeholder="Ej: 123456789" autocomplete="off">
+        <button id="go" class="btn primary" aria-label="Buscar">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M10 18l6-6-6-6"/></svg> Buscar
+        </button>
+      </div>
+      <datalist id="hintList"></datalist>
+    </div>
+  </section>
+
+  <!-- Screen 2: Grid con selección -->
+  <section id="screen-grid" class="hidden">
+    <div class="bar-top">
+      <div class="wrap">
+        <div class="row">
+          <div>
+            <div class="title" id="ttl">Cédula —</div>
+            <div class="subtitle muted">Toca para ver grande y usa ✓ para seleccionar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <div id="error" class="empty hidden"></div>
+      <div id="grid" class="grid"></div>
+    </main>
+
+    <!-- Bottom App Bar: copiar enlace -->
+    <div class="bottom-bar">
+      <div class="bottom-inner wrap">
+        <div class="sel-info">
+          Seleccionadas: <span id="selCount">0</span>
+        </div>
+        <div>
+          <button id="copySel" class="btn primary" title="Copiar enlace">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L10.5 4.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l.53-.53"/></svg>
+            Copiar enlace
+          </button>
+        </div>
+
+        <!-- Caja con el enlace para copiar manualmente -->
+        <div id="shareBox" class="link-out hidden">
+          <input id="shareInput" readonly aria-label="Enlace para compartir">
+          <button id="copyAgain" class="btn tonal">Copiar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 3: Enlace compartido (solo ver selección + descargar selección) -->
+  <section id="screen-link" class="hidden">
+    <div class="wrap">
+      <div class="link-head">
+        <div>
+          <div class="link-title" id="linkCed">Cédula —</div>
+          <div class="link-note">Vista de selección</div>
+        </div>
+        <button id="dlSel" class="btn primary">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Descargar selección
+        </button>
+      </div>
+
+      <div id="gridLink" class="grid" style="padding-bottom:24px"></div>
+      <div id="emptyLink" class="empty hidden">No hay fotos seleccionadas en este enlace.</div>
+    </div>
+  </section>
+
+  <!-- Visor a pantalla completa -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <!-- Header compacto -->
+    <div class="v-head">
+      <button id="vClose" class="btn icon" aria-label="Cerrar">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div id="vPos" class="v-pos">—</div>
+      <button id="vPick" class="btn icon" aria-label="Seleccionar">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+    </div>
+
+    <!-- Imagen -->
+    <div class="v-stage" id="vStage">
+      <img id="vImg" alt="">
+      <!-- Flechas laterales (desktop) -->
+      <button id="vPrev" class="nav nav-left" title="Anterior" aria-label="Anterior">
+        <svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button id="vNext" class="nav nav-right" title="Siguiente" aria-label="Siguiente">
+        <svg class="ic" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div id="vBadge" class="v-selected-badge">✓ Seleccionada</div>
+    </div>
+
+    <!-- Pie: navegación móvil + contador selección -->
+    <div class="v-foot">
+      <button id="vPrevM" class="btn">Anterior</button>
+      <div id="vSelWrap" class="v-pill">Seleccionadas: <span id="vSelCount">0</span></div>
+      <button id="vNextM" class="btn">Siguiente</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Datos embebidos (fallback) -->
+  <script id="__GALLERY__" type="application/json">
+  {
+    "version": 1,
+    "generatedAt": "2025-08-19T18:22:00Z",
+    "base": { "photos": "./photos/", "thumbs": "./thumbs/" },
+    "albums": [
+      { "id": "123456789", "count": 6, "cover": "IMG_0001.JPG", "files": ["IMG_0001.JPG","IMG_0002.JPG","IMG_0003.JPG","IMG_0004.JPG","IMG_0005.JPG","IMG_0006.JPG"] },
+      { "id": "123456788", "count": 3, "cover": "IMG_1001.JPG", "files": ["IMG_1001.JPG","IMG_1002.JPG","IMG_1003.JPG"] }
+    ]
+  }
+  </script>
+
+  <script>
+    // Utils
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+    const screens = {
+      home: $('#screen-home'),
+      grid: $('#screen-grid'),
+      link: $('#screen-link')
+    };
+
+    const els = {
+      q: $('#q'), go: $('#go'),
+      ttl: $('#ttl'), grid: $('#grid'), err: $('#error'),
+      selCount: $('#selCount'), copySel: $('#copySel'),
+      linkCed: $('#linkCed'), gridLink: $('#gridLink'), emptyLink: $('#emptyLink'),
+      dlSel: $('#dlSel'),
+      toast: $('#toast'),
+      hints: $('#hintList'),
+      bg: $('#bgCollage'),
+
+      // Share box
+      shareBox: $('#shareBox'), shareInput: $('#shareInput'), copyAgain: $('#copyAgain'),
+
+      // Viewer
+      overlay: $('#overlay'), vImg: $('#vImg'),
+      vClose: $('#vClose'), vPrev: $('#vPrev'), vNext: $('#vNext'),
+      vPrevM: $('#vPrevM'), vNextM: $('#vNextM'),
+      vPick: $('#vPick'), vStage: $('#vStage'),
+      vPos: $('#vPos'),
+      vSelWrap: $('#vSelWrap'), vSelCount: $('#vSelCount'),
+      vBadge: $('#vBadge')
+    };
+
+    const state = {
+      data: null,
+      album: null,
+      files: [],
+      full: [],
+      thumbs: [],
+      picked: new Set(), // índices seleccionados en modo grid
+      // link view:
+      linkCed: null,
+      linkNames: [],
+      linkUrls: [],
+      linkThumbs: [],
+      // viewer
+      view: { source: null, idx: 0 } // 'grid' | 'link'
+    };
+
+    // Init
+    init();
+
+    async function init(){
+      // Solo dígitos
+      els.q.addEventListener('input', function(){
+        const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+      });
+      els.go.addEventListener('click', onSearch);
+      els.q.addEventListener('keydown', (e)=>{ if(e.key==='Enter') onSearch(); });
+
+      els.copySel.addEventListener('click', copySelection);
+      els.dlSel.addEventListener('click', downloadLinkZip);
+
+      // Share box
+      els.copyAgain?.addEventListener('click', async ()=>{
+        const ok = await copyText(els.shareInput.value);
+        toast(ok ? 'Enlace copiado' : 'No se pudo copiar.');
+      });
+
+      // Viewer events
+      els.vClose.addEventListener('click', closeViewer);
+      els.vPrev.addEventListener('click', ()=> nav(-1));
+      els.vNext.addEventListener('click', ()=> nav(1));
+      els.vPrevM.addEventListener('click', ()=> nav(-1));
+      els.vNextM.addEventListener('click', ()=> nav(1));
+      els.vStage.addEventListener('click', onStageClick); // click en bordes para navegar
+      els.vPick.addEventListener('click', togglePickFromViewer);
+      window.addEventListener('keydown', onKey);
+
+      // Carga datos
+      state.data = await loadGallery();
+      fillHints(state.data);
+      renderHomeBackground(state.data);
+
+      // Enrutado simple por query
+      routeFromURL();
+      window.addEventListener('popstate', routeFromURL);
+    }
+
+    function setScreen(name){
+      Object.values(screens).forEach(s => s.classList.add('hidden'));
+      screens[name].classList.remove('hidden');
+      // Ocultar caja de compartir fuera del grid
+      if(name !== 'grid') els.shareBox?.classList.add('hidden');
+    }
+
+    async function loadGallery(){
+      // 1) intentar externo
+      for(const u of ['./gallery.json','./data/gallery.json']){
+        try{
+          const res = await fetch(u, { cache: 'no-store' });
+          if(res.ok) return await res.json();
+        }catch{}
+      }
+      // 2) fallback embebido
+      const inline = document.getElementById('__GALLERY__');
+      if(inline?.textContent?.trim()){
+        try{ return JSON.parse(inline.textContent); }catch{}
+      }
+      return { base:{ photos:'./photos/', thumbs:'./thumbs/' }, albums:[] };
+    }
+
+    function fillHints(data){
+      if(!els.hints) return;
+      els.hints.innerHTML = (data.albums||[]).map(a=>`<option value="${a.id}"></option>`).join('');
+      els.q.setAttribute('list','hintList');
+    }
+
+    function thumbPath(folder, name, baseThumbs){
+      const i = name.lastIndexOf('.');
+      const b = i>=0 ? name.slice(0,i) : name;
+      const tbase = (baseThumbs||'./thumbs/').replace(/\/+$/,'') + '/' + encodeURIComponent(folder) + '/' + encodeURIComponent(b);
+      return {
+        src: `${tbase}-w640.webp`,
+        srcset: `${tbase}-w256.webp 256w, ${tbase}-w640.webp 640w, ${tbase}-w1024.webp 1024w`,
+        sizes: '(max-width: 700px) 50vw, (max-width: 1100px) 25vw, 220px'
+      };
+    }
+
+    function joinURL(...parts){
+      return parts.map(p => String(p).replace(/(^\/+|\/+$)/g,'')).filter(Boolean).join('/').replace(/^/,'./');
+    }
+
+    function onSearch(){
+      const id = els.q.value.trim();
+      if(!id){ toast('Escribe una cédula'); return; }
+      search(id, true);
+    }
+
+    function routeFromURL(){
+      const p = new URLSearchParams(location.search);
+      const ced = p.get('cedula');
+      const selParam = p.get('sel');
+      const names = decodeSel(selParam);
+
+      if(ced && names.length){
+        openLinkView(ced, names, false);
+      }else if(ced){
+        search(ced, false);
+      }else{
+        setScreen('home');
+      }
+    }
+
+    async function search(id, pushHistory){
+      const a = (state.data.albums||[]).find(x => x.id === id);
+      if(!a){ showErr('No encontramos esa cédula.'); setScreen('home'); return; }
+      clearErr();
+
+      state.album = a;
+      const baseP = state.data.base?.photos || './photos/';
+      const baseT = state.data.base?.thumbs || './thumbs/';
+
+      state.files = a.files.slice();
+      state.full  = state.files.map(n => joinURL(baseP, id, n));
+      state.thumbs = state.files.map(n => thumbPath(id, n, baseT));
+      state.picked.clear();
+
+      els.ttl.textContent = `Cédula ${id} • ${state.files.length} foto${state.files.length===1?'':'s'}`;
+
+      renderGrid();
+      setScreen('grid');
+
+      if(pushHistory){
+        const u = new URL(location.href);
+        u.search = ''; u.searchParams.set('cedula', id);
+        history.pushState({}, '', u);
+      }
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    function renderGrid(){
+      els.grid.innerHTML = '';
+      if(!state.files.length){
+        showErr('Este álbum no tiene fotos.');
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      state.files.forEach((name, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.i = String(i);
+        card.dataset.picked = 'false';
+
+        const t = state.thumbs[i];
+        const img = new Image();
+        img.loading = 'lazy'; img.decoding = 'async';
+        img.src = t.src; img.srcset = t.srcset; img.sizes = t.sizes;
+        img.alt = `Foto ${i+1}`;
+        img.addEventListener('error', () => { img.removeAttribute('srcset'); img.src = state.full[i]; });
+
+        const pick = document.createElement('button');
+        pick.className = 'pick';
+        pick.type = 'button';
+        pick.title = 'Seleccionar';
+        pick.setAttribute('aria-pressed','false');
+        pick.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
+        pick.addEventListener('click', (e)=>{ e.stopPropagation(); togglePick(i, card); });
+
+        const badge = document.createElement('div');
+        badge.className = 'chip';
+        badge.textContent = 'Seleccionada';
+
+        card.addEventListener('click', () => openViewerAt('grid', i));
+        card.append(img, pick, badge);
+        frag.appendChild(card);
+      });
+      els.grid.appendChild(frag);
+      updateSelInfo();
+    }
+
+    function togglePick(i, cardEl){
+      const willPick = !state.picked.has(i);
+      if(willPick){
+        state.picked.add(i);
+        cardEl.dataset.picked = 'true';
+      }else{
+        state.picked.delete(i);
+        cardEl.dataset.picked = 'false';
+      }
+      const btn = cardEl.querySelector('.pick');
+      if(btn){
+        btn.setAttribute('aria-pressed', willPick ? 'true' : 'false');
+        btn.title = willPick ? 'Quitar de selección' : 'Seleccionar';
+      }
+      updateSelInfo();
+      if(state.view.source==='grid' && state.view.idx===i) syncViewerPickButton();
+    }
+
+    function updateSelInfo(){
+      const n = state.picked.size;
+      els.selCount.textContent = String(n);
+      // si el visor está abierto en modo grid, actualizar el contador visible
+      if(state.view.source==='grid'){
+        els.vSelCount.textContent = String(n);
+      }
+    }
+
+    async function copySelection(){
+      if(!state.album){ toast('Primero busca una cédula.'); return; }
+      const names = [...state.picked].sort((a,b)=>a-b).map(i => state.files[i]);
+      if(!names.length){ toast('No has seleccionado fotos.'); return; }
+      const u = new URL(location.href);
+      u.search = '';
+      u.searchParams.set('cedula', state.album.id);
+      u.searchParams.set('sel', encodeSel(names));
+      const link = u.toString();
+
+      // Mostrar siempre para copia manual
+      showShareBox(link);
+
+      // Copiar con fallback
+      const ok = await copyText(link);
+      toast(ok ? 'Enlace copiado' : 'No se pudo copiar. Copia manualmente.');
+    }
+
+    // Vista de enlace compartido
+    function openLinkView(ced, names, push){
+      const album = (state.data.albums||[]).find(x => x.id === ced);
+      const baseP = state.data.base?.photos || './photos/';
+      const baseT = state.data.base?.thumbs || './thumbs/';
+      let list = names;
+
+      if(album){
+        const set = new Set(album.files);
+        list = names.filter(n => set.has(n));
+      }
+
+      state.linkCed = ced;
+      state.linkNames = list;
+      state.linkUrls = list.map(n => joinURL(baseP, ced, n));
+      state.linkThumbs = list.map(n => thumbPath(ced, n, baseT));
+
+      els.linkCed.textContent = `Cédula ${ced}`;
+      renderLinkGrid();
+
+      setScreen('link');
+
+      if(push){
+        const u = new URL(location.href);
+        u.search = '';
+        u.searchParams.set('cedula', ced);
+        if(list.length) u.searchParams.set('sel', encodeSel(list));
+        history.pushState({}, '', u);
+      }
+
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    function renderLinkGrid(){
+      const n = state.linkNames.length;
+      els.gridLink.innerHTML = '';
+      els.emptyLink.classList.toggle('hidden', n > 0);
+      if(!n) return;
+
+      const frag = document.createDocumentFragment();
+      for(let i=0;i<n;i++){
+        const card = document.createElement('div');
+        card.className = 'card';
+        const t = state.linkThumbs[i];
+        const img = new Image();
+        img.loading = 'lazy'; img.decoding='async';
+        img.src = t.src; img.srcset = t.srcset; img.sizes = t.sizes;
+        img.alt = `Foto seleccionada ${i+1}`;
+        img.addEventListener('error', ()=>{ img.removeAttribute('srcset'); img.src = state.linkUrls[i]; });
+        card.addEventListener('click', () => openViewerAt('link', i));
+        card.append(img);
+        frag.appendChild(card);
+      }
+      els.gridLink.appendChild(frag);
+    }
+
+    async function downloadLinkZip(){
+      const ced = state.linkCed || 'cedula';
+      const names = state.linkNames || [];
+      const urls = state.linkUrls || [];
+      if(!names.length){ toast('No hay fotos para descargar.'); return; }
+      const JSZip = await loadJSZip().catch(()=>null);
+      if(!JSZip){ toast('No se pudo cargar el generador de ZIP.'); return; }
+
+      const zip = new JSZip();
+      for(let i=0;i<urls.length;i++){
+        try{
+          const res = await fetch(urls[i]);
+          const blob = await res.blob();
+          zip.file(names[i] || `foto-${i+1}.jpg`, blob);
+        }catch{}
+      }
+      const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+      downloadBlob(blob, `${ced}.zip`);
+    }
+
+    function loadJSZip(){
+      if(window.JSZip) return Promise.resolve(window.JSZip);
+      return new Promise((resolve,reject)=>{
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        s.onload = ()=>resolve(window.JSZip);
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    function downloadBlob(blob, name){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    }
+
+    function showErr(msg){ els.err.textContent = msg; els.err.classList.remove('hidden'); }
+    function clearErr(){ els.err.textContent = ''; els.err.classList.add('hidden'); }
+
+    function toast(msg){
+      const t = els.toast;
+      t.textContent = msg;
+      t.style.display = 'block';
+      t.style.opacity = '0';
+      requestAnimationFrame(()=> t.style.opacity = '1');
+      setTimeout(()=>{
+        t.style.opacity = '0';
+        setTimeout(()=> t.style.display = 'none', 220);
+      }, 1600);
+    }
+
+    function encodeSel(arr){ return arr.map(encodeURIComponent).join(','); }
+    function decodeSel(param){
+      if(!param) return [];
+      return param.split(',').map(s=>{ try{ return decodeURIComponent(s); } catch{ return s; } }).filter(Boolean);
+    }
+
+    function showShareBox(link){
+      if(!els.shareBox) return;
+      els.shareInput.value = link;
+      els.shareBox.classList.remove('hidden');
+      // Seleccionar el texto para que sea fácil copiarlo en móvil
+      els.shareInput.focus({ preventScroll:true });
+      els.shareInput.select();
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch{
+        try{
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly','');
+          ta.style.position = 'fixed';
+          ta.style.top = '-1000px';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return !!ok;
+        }catch{
+          return false;
+        }
+      }
+    }
+
+    /* ========== Visor (lightbox) ========== */
+    function openViewerAt(source, idx){
+      state.view.source = source;
+      state.view.idx = idx || 0;
+      updateViewer();
+      els.overlay.classList.add('show');
+      els.overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeViewer(){
+      els.overlay.classList.remove('show');
+      els.overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function currentArrays(){
+      if(state.view.source === 'link'){
+        return { names: state.linkNames, urls: state.linkUrls, thumbs: state.linkThumbs, ced: state.linkCed };
+      }
+      return { names: state.files, urls: state.full, thumbs: state.thumbs, ced: state.album?.id || '' };
+    }
+
+    function updateViewer(){
+      const { names, urls, thumbs } = currentArrays();
+      const i = state.view.idx = clampIndex(state.view.idx, urls.length);
+      if(!urls.length){ closeViewer(); return; }
+
+      // Pre-carga mini y luego grande
+      const t = thumbs[i];
+      els.vImg.src = t?.src || urls[i];
+      const big = new Image();
+      big.decoding = 'async';
+      big.onload = () => { els.vImg.src = urls[i]; };
+      big.src = urls[i];
+
+      // Posición
+      els.vPos.textContent = `${i+1}/${urls.length}`;
+
+      // Botón seleccionar visible solo en 'grid'
+      const isGrid = state.view.source === 'grid';
+      els.vPick.classList.toggle('hidden', !isGrid);
+      els.vSelWrap.classList.toggle('hidden', !isGrid);
+      if(isGrid){
+        els.vSelCount.textContent = String(state.picked.size);
+        syncViewerPickButton();
+      }else{
+        els.vStage.dataset.picked = 'false';
+        els.vPick.setAttribute('aria-pressed','false');
+      }
+
+      // Prefetch vecinos
+      const a = (i + 1) % urls.length;
+      const b = (i - 1 + urls.length) % urls.length;
+      [a,b].forEach(j=>{
+        const l = document.createElement('link');
+        l.rel='prefetch'; l.as='image'; l.href = urls[j];
+        document.head.appendChild(l);
+      });
+    }
+
+    function clampIndex(i, len){
+      if(len<=0) return 0;
+      return (i + len) % len;
+    }
+
+    function nav(delta){
+      const { urls } = currentArrays();
+      if(!urls.length) return;
+      state.view.idx = clampIndex(state.view.idx + delta, urls.length);
+      updateViewer();
+    }
+
+    function onKey(e){
+      if(els.overlay.getAttribute('aria-hidden') === 'true') return;
+      if(e.key === 'Escape') return closeViewer();
+      if(e.key === 'ArrowRight') return nav(1);
+      if(e.key === 'ArrowLeft') return nav(-1);
+      if(e.key === ' ' || e.key.toLowerCase?.() === 's'){
+        e.preventDefault();
+        togglePickFromViewer();
+      }
+    }
+
+    // Clic en los bordes del stage para navegar (izquierda/ derecha)
+    function onStageClick(e){
+      const rect = els.vStage.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      if(x < rect.width / 2) nav(-1); else nav(1);
+    }
+
+    function syncViewerPickButton(){
+      if(state.view.source !== 'grid') return;
+      const i = state.view.idx;
+      const picked = state.picked.has(i);
+      els.vPick.setAttribute('aria-pressed', picked ? 'true' : 'false');
+      els.vPick.setAttribute('aria-label', picked ? 'Quitar de selección' : 'Agregar a selección');
+      els.vStage.dataset.picked = picked ? 'true' : 'false';
+    }
+
+    function togglePickFromViewer(){
+      if(state.view.source !== 'grid') return;
+      const i = state.view.idx;
+      const card = document.querySelector(`.card[data-i="${i}"]`);
+      if(!card) return;
+      if(state.picked.has(i)){
+        state.picked.delete(i);
+        card.dataset.picked = 'false';
+      }else{
+        state.picked.add(i);
+        card.dataset.picked = 'true';
+      }
+      const btn = card.querySelector('.pick');
+      if(btn){
+        const isPicked = state.picked.has(i);
+        btn.setAttribute('aria-pressed', isPicked ? 'true' : 'false');
+        btn.title = isPicked ? 'Quitar de selección' : 'Seleccionar';
+      }
+      updateSelInfo();
+      syncViewerPickButton();
+    }
+
+    /* ========== Fondo: collage en pantalla de inicio ========== */
+    function renderHomeBackground(manifest){
+      const root = els.bg;
+      if(!root) return;
+      const items = pickBackgrounds(manifest, 30);
+      root.innerHTML = '';
+      const frag = document.createDocumentFragment();
+      items.forEach(it=>{
+        const img = new Image();
+        img.loading = 'lazy'; img.decoding = 'async';
+        img.src = it.thumb; img.alt = '';
+        img.onerror = () => { img.removeAttribute('srcset'); img.src = it.full; };
+        frag.appendChild(img);
+      });
+      root.appendChild(frag);
+    }
+    function pickBackgrounds(manifest, max = 30){
+      const albums = manifest.albums || [];
+      const out = [];
+      let i = 0;
+      while(out.length < max && i < 1000){
+        i++;
+        const a = albums[Math.floor(Math.random()*albums.length)];
+        if(!a || !a.files?.length) continue;
+        const f = a.files[Math.floor(Math.random()*a.files.length)];
+        out.push({
+          thumb: thumbPath(a.id, f, manifest.base?.thumbs || './thumbs/').src,
+          full: joinURL(manifest.base?.photos || './photos/', a.id, f)
+        });
+      }
+      return out;
+    }
+  </script>
+</body>
+</html>

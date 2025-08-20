@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>FotoID Studio — Generador de gallery.json y miniaturas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto; margin: 24px; line-height: 1.5; }
+    h1 { margin: 0 0 8px; }
+    .muted { color: #64748b; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 10px 0; }
+    .panel {
+      border: 1px dashed #94a3b8; padding: 16px; border-radius: 14px; background: color-mix(in oklab, Canvas, black 5%);
+    }
+    button { padding: 10px 14px; border-radius: 10px; border: 1px solid #1f29371a; background: #111827; color: #fff; cursor: pointer; }
+    button.ghost { background: #fff; color: #111827; }
+    input[type="number"] { width: 90px; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    label { display: inline-flex; align-items: center; gap: 8px; }
+    progress { width: 320px; height: 12px; }
+    pre { background: #f4f6f8; border-radius: 10px; padding: 10px; overflow: auto; max-height: 40vh; }
+    .drop {
+      border: 2px dashed #94a3b8; border-radius: 14px; padding: 30px; text-align: center; margin: 12px 0;
+      background: color-mix(in oklab, Canvas, black 3%);
+    }
+    .ok { color: #10b981; }
+    .err { color: #ef4444; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+</head>
+<body>
+  <h1>FotoID Studio</h1>
+  <p class="muted">Suelta aquí tu carpeta <b>photos</b> (o un ZIP) con subcarpetas numéricas.</p>
+
+  <div class="panel">
+    <div class="row">
+      <button id="pick">Seleccionar carpeta/ZIP</button>
+      <input id="in" type="file" webkitdirectory directory multiple hidden />
+      <input id="zipIn" type="file" accept=".zip" hidden />
+      <span id="status" class="muted">Sin datos cargados.</span>
+    </div>
+
+    <div class="drop" id="drop">Arrastra aquí la carpeta "photos" o un ZIP</div>
+
+    <div class="row">
+      <label><input type="checkbox" id="genThumbs" checked /> Generar miniaturas</label>
+      <label>Anchuras: <input type="number" id="w1" value="256" /> <input type="number" id="w2" value="640" /> <input type="number" id="w3" value="1024" /></label>
+    </div>
+    <div class="row">
+      <label>Calidad WebP: <input type="number" id="q" value="0.75" step="0.05" min="0" max="1" /></label>
+      <label>Concurrencia: <input type="number" id="cc" value="3" min="1" max="8" /></label>
+      <label><input type="checkbox" id="lqip" /> Generar LQIP (placeholder base64)</label>
+    </div>
+    <div class="row">
+      <button id="build" disabled>Construir gallery.json</button>
+      <button id="dlManifest" disabled class="ghost">Descargar gallery.json</button>
+      <button id="dlThumbs" disabled>Descargar thumbs.zip</button>
+      <progress id="prog" value="0" max="1" hidden></progress>
+      <span id="pTxt" class="muted"></span>
+    </div>
+  </div>
+
+  <h3>Salida</h3>
+  <pre id="out"></pre>
+
+<script>
+const allowed = new Set(['.jpg','.jpeg','.png','.gif','.webp','.avif','.JPG','.JPEG','.PNG','.GIF','.WEBP','.AVIF']);
+const statusEl = document.getElementById('status');
+const pickBtn = document.getElementById('pick');
+const dirInput = document.getElementById('in');
+const zipInput = document.getElementById('zipIn');
+const drop = document.getElementById('drop');
+const out = document.getElementById('out');
+const btnBuild = document.getElementById('build');
+const btnDlManifest = document.getElementById('dlManifest');
+const btnDlThumbs = document.getElementById('dlThumbs');
+const prog = document.getElementById('prog');
+const pTxt = document.getElementById('pTxt');
+
+const chkThumbs = document.getElementById('genThumbs');
+const w1 = document.getElementById('w1');
+const w2 = document.getElementById('w2');
+const w3 = document.getElementById('w3');
+const q = document.getElementById('q');
+const cc = document.getElementById('cc');
+const chkLQIP = document.getElementById('lqip');
+
+let items = []; // { relPath, file }
+let groups = new Map(); // folder -> [files]
+let manifest = null;
+let thumbsZip = null;
+
+pickBtn.addEventListener('click', async () => {
+  // Ofrecer carpeta o zip
+  const choice = confirm('OK: seleccionar carpeta\nCancelar: seleccionar ZIP');
+  if (choice) dirInput.click();
+  else zipInput.click();
+});
+dirInput.addEventListener('change', (e) => {
+  const files = Array.from(e.target.files || []);
+  loadFromFiles(files.map(f => ({ file:f, relPath:f.webkitRelativePath || f.name })));
+});
+zipInput.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const entries = await readZipEntries(file);
+  loadFromFiles(entries);
+});
+
+drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.style.background = '#00000010'; });
+drop.addEventListener('dragleave', () => drop.style.background = 'transparent');
+drop.addEventListener('drop', async (e) => {
+  e.preventDefault(); drop.style.background = 'transparent';
+  const dt = e.dataTransfer;
+  const file = dt.files?.[0];
+  if (!file) return;
+  if (file.name.endsWith('.zip')) {
+    const entries = await readZipEntries(file);
+    loadFromFiles(entries);
+  } else {
+    const files = Array.from(dt.files || []);
+    loadFromFiles(files.map(f => ({ file:f, relPath:f.webkitRelativePath || f.name })));
+  }
+});
+
+btnBuild.addEventListener('click', () => buildManifest());
+btnDlManifest.addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(manifest, null, 2)], { type:'application/json' });
+  downloadBlob(blob, 'gallery.json');
+});
+btnDlThumbs.addEventListener('click', async () => {
+  if (!thumbsZip) return;
+  const blob = await thumbsZip.generateAsync({ type:'blob', compression:'DEFLATE', compressionOptions:{ level: 6 } });
+  downloadBlob(blob, 'thumbs.zip');
+});
+
+async function loadFromFiles(list) {
+  items = [];
+  groups.clear();
+  thumbsZip = null;
+  manifest = null;
+  out.textContent = '';
+  pTxt.textContent = '';
+  prog.hidden = true;
+  btnBuild.disabled = true;
+  btnDlManifest.disabled = true;
+  btnDlThumbs.disabled = true;
+
+  // Filtrar por estructura: photos/<cedula>/<archivo>
+  for (const { file, relPath } of list) {
+    const parts = relPath.split('/').filter(Boolean);
+    // admite fotos... o si viene raíz photos/
+    const idxPhotos = parts[0] === 'photos' ? 1 : 0;
+    if (parts.length - idxPhotos < 2) continue;
+    const folder = parts[idxPhotos];
+    if (!/^\d+$/.test(folder)) continue;
+    const name = parts[parts.length - 1];
+    if (!allowed.has(extOf(name))) continue;
+
+    items.push({ folder, name, file, relPath });
+    if (!groups.has(folder)) groups.set(folder, []);
+    groups.get(folder).push({ name, file });
+  }
+  for (const [k, arr] of groups) {
+    arr.sort((a,b) => a.name.localeCompare(b.name, undefined, { numeric:true, sensitivity:'base' }));
+  }
+
+  const total = items.length;
+  const albums = Array.from(groups.keys()).length;
+  if (!total) {
+    statusEl.textContent = 'No se detectaron imágenes válidas.';
+    return;
+  }
+  statusEl.innerHTML = `Detectadas <b>${albums}</b> carpetas y <b>${total}</b> imágenes.`;
+  btnBuild.disabled = false;
+}
+
+async function buildManifest() {
+  const widths = [parseInt(w1.value,10)||256, parseInt(w2.value,10)||640, parseInt(w3.value,10)||1024]
+    .filter((v,i,arr)=> Number.isFinite(v) && v>0 && arr.indexOf(v)===i).sort((a,b)=>a-b);
+  const quality = Math.max(0, Math.min(1, Number(q.value)||0.75));
+  const concurrency = Math.max(1, Math.min(8, parseInt(cc.value,10)||3));
+
+  const base = { photos: './photos/', thumbs: './thumbs/' };
+  const albums = Array.from(groups.entries()).map(([id, arr]) => ({
+    id, cover: arr[0]?.name || null, count: arr.length, files: arr.map(x => x.name)
+  }));
+
+  manifest = { version: 1, generatedAt: new Date().toISOString(), base, albums };
+  btnDlManifest.disabled = false;
+
+  if (!chkThumbs.checked) {
+    out.textContent = JSON.stringify(manifest, null, 2);
+    statusEl.innerHTML = `<span class="ok">Listo:</span> gallery.json generado.`;
+    return;
+  }
+
+  thumbsZip = new JSZip();
+  // procesamiento concurrente
+  const list = items.slice();
+  prog.hidden = false; prog.value = 0; prog.max = list.length;
+  pTxt.textContent = 'Generando miniaturas…';
+
+  let i = 0, done = 0, fails = 0;
+
+  async function worker() {
+    while (i < list.length) {
+      const idx = i++;
+      const { folder, name, file } = list[idx];
+      try {
+        const { width, height } = await imageSize(file);
+        for (const w of widths) {
+          const targetW = Math.min(w, width);
+          const targetH = Math.round(height * (targetW / width));
+          const blob = await resizeToWebP(file, targetW, targetH, quality);
+          const base = stripExt(name);
+          thumbsZip.file(`${folder}/${base}-w${targetW}.webp`, blob);
+        }
+      } catch (err) {
+        console.warn('Falló thumb', name, err);
+        fails++;
+      } finally {
+        done++; prog.value = done; pTxt.textContent = `Listo ${done}/${list.length}${fails?` — errores: ${fails}`:''}`;
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: concurrency }, worker));
+
+  btnDlThumbs.disabled = false;
+  out.textContent = JSON.stringify(manifest, null, 2);
+  statusEl.innerHTML = `<span class="ok">Listo:</span> gallery.json y thumbs.zip listos. Coloca thumbs/ y gallery.json en el proyecto.`;
+}
+
+function extOf(n){ const i = n.lastIndexOf('.'); return i>=0 ? n.slice(i).toLowerCase() : ''; }
+function stripExt(n){ const i = n.lastIndexOf('.'); return i>=0 ? n.slice(0, i) : n; }
+
+function downloadBlob(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function imageSize(file) {
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onerror = () => rej(new Error('No se pudo decodificar'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function resizeToWebP(file, w, h, quality) {
+  const bmp = await createBitmap(file);
+  const targetW = Math.min(w, bmp.width);
+  const targetH = Math.round(bmp.height * (targetW / bmp.width));
+  const canvas = ('OffscreenCanvas' in window) ? new OffscreenCanvas(targetW, targetH) : Object.assign(document.createElement('canvas'), { width: targetW, height: targetH });
+  if (!('OffscreenCanvas' in window)) { canvas.width = targetW; canvas.height = targetH; }
+  const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+  ctx.drawImage(bmp, 0, 0, targetW, targetH);
+  if (canvas.convertToBlob) {
+    return await canvas.convertToBlob({ type: 'image/webp', quality });
+  }
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+}
+
+async function createBitmap(file) {
+  // createImageBitmap fallback para Safari iOS
+  if ('createImageBitmap' in window && !/iP(hone|ad|od)/.test(navigator.userAgent)) {
+    try { return await createImageBitmap(file); } catch {}
+  }
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const ctx = c.getContext('2d', { alpha:false, desynchronized:true });
+      ctx.drawImage(img, 0, 0);
+      c.toBlob(b => {
+        createImageBitmap(b).then(res).catch(rej);
+      }, 'image/png');
+    };
+    img.onerror = rej;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function readZipEntries(zipFile) {
+  const JSZipRef = window.JSZip;
+  const zip = await JSZipRef.loadAsync(zipFile);
+  const out = [];
+  await Promise.all(Object.keys(zip.files).map(async (path) => {
+    const entry = zip.files[path];
+    if (entry.dir) return;
+    const parts = path.split('/').filter(Boolean);
+    const idxPhotos = parts[0] === 'photos' ? 1 : 0;
+    if (parts.length - idxPhotos < 2) return;
+    const folder = parts[idxPhotos];
+    if (!/^\d+$/.test(folder)) return;
+    const name = parts[parts.length - 1];
+    if (!allowed.has(extOf(name))) return;
+    const file = await entry.async('blob').then(b => new File([b], name, { type: b.type || 'application/octet-stream' }));
+    out.push({ file, relPath: path });
+  }));
+  return out;
+}
+</script>
+</body>
+</html>

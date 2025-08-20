@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Visor de Fotos — Promo XXX | U.E. Cnel (B) Adolfo Valbuena Bravo</title>
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    /* --- THEME & RESET --- */
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --text: #1a1d21;
+      --text-muted: #6c757d;
+      --border: #dee2e6;
+      --primary: #007bff;
+      --primary-text: #ffffff;
+      --danger: #dc3545;
+      --radius: 12px;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      color-scheme: light;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    img, svg { display: block; max-width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* --- LAYOUT & MAIN COMPONENTS --- */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: clamp(1rem, 5vw, 2.5rem);
+    }
+
+    header {
+      text-align: center;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.5px; }
+    header p { font-size: 1.1rem; color: var(--text-muted); max-width: 60ch; margin: 0.5rem auto 0; }
+    
+    /* --- SEARCH --- */
+    .search-container {
+      margin-top: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .search-form {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background-color: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .search-form:focus-within {
+      box-shadow: 0 0 0 3px var(--primary);
+    }
+    .search-form input {
+      flex-grow: 1;
+      border: none;
+      outline: none;
+      padding: 1rem;
+      font-size: 1rem;
+      background: none;
+    }
+    .search-form button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 1.5rem;
+      background-color: var(--primary);
+      color: var(--primary-text);
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .search-form button:hover { opacity: 0.85; }
+    .search-form .ic { width: 1.25em; height: 1.25em; stroke: currentColor; }
+
+    /* --- GALLERY GRID --- */
+    #gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 2.5rem 0;
+    }
+    
+    .photo-card {
+      background-color: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: zoom-in;
+      position: relative;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .photo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
+    
+    .photo-card img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+    
+    .selection-tick {
+      position: absolute;
+      top: 0.75rem; right: 0.75rem;
+      width: 1.75rem; height: 1.75rem;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background-color: rgba(255,255,255,0.8);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      z-index: 2;
+      transition: background-color 0.2s, color 0.2s;
+      color: var(--text-muted);
+    }
+    .selection-tick .ic { width: 1.2em; height: 1.2em; }
+    
+    .photo-card.picked {
+      outline: 3px solid var(--primary);
+      outline-offset: 2px;
+    }
+    .photo-card.picked .selection-tick {
+      background-color: var(--primary);
+      color: var(--primary-text);
+      border-color: var(--primary);
+    }
+    
+    /* View Transition Name: Unique for each card image */
+    .photo-card img { view-transition-name: var(--photo-id); }
+    
+    /* --- MESSAGES --- */
+    .message-area {
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--text-muted);
+    }
+    
+    /* --- SELECTION ACTIONS BAR --- */
+    #selection-bar {
+      position: fixed;
+      bottom: -150px; /* Initially hidden */
+      left: 0; right: 0;
+      z-index: 50;
+      transition: bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #selection-bar.visible { bottom: 0; }
+    
+    .selection-bar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      padding: 1rem 1.5rem;
+      background-color: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+      border: 1px solid var(--border);
+    }
+    .selection-info { font-weight: 600; }
+    .selection-actions { display: flex; gap: 0.75rem; }
+
+    .btn {
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--bg);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center; gap: 0.5rem;
+    }
+    .btn:hover { background-color: #e9ecef; }
+    .btn.primary {
+      background-color: var(--primary);
+      color: var(--primary-text);
+      border-color: var(--primary);
+    }
+    .btn.primary:hover { background-color: #0069d9; }
+    
+    /* --- LIGHTBOX (MODAL VIEWER) --- */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background-color: rgba(248, 249, 250, 0.95);
+      backdrop-filter: blur(8px);
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #lightbox.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    #lightbox-img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: var(--radius);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      view-transition-name: var(--photo-id);
+    }
+    
+    .lightbox-nav, .lightbox-close {
+      position: fixed;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.8);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: grid; place-items: center;
+    }
+    .lightbox-close { top: 1.5rem; right: 1.5rem; }
+    .lightbox-nav { top: 50%; transform: translateY(-50%); }
+    .lightbox-prev { left: 1.5rem; }
+    .lightbox-next { right: 1.5rem; }
+
+    /* --- TOAST --- */
+    #toast {
+        position: fixed; bottom: 2rem; left: 50%;
+        transform: translate(-50%, 200%);
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        background-color: var(--text);
+        color: var(--bg);
+        box-shadow: var(--shadow);
+        font-weight: 600;
+        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 200;
+    }
+    #toast.show { transform: translate(-50%, 0); }
+  </style>
+</head>
+<body>
+
+  <header class="container">
+    <h1>FotoID — Promo XXX</h1>
+    <p>Mira tus fotos, selecciónalas (máx. 6) y comparte el enlace para la impresión.</p>
+    <div class="search-container">
+      <form class="search-form" id="search-form">
+        <input id="q" type="text" inputmode="numeric" placeholder="Ingresa tu número de cédula" autocomplete="off" list="hintList" required>
+        <datalist id="hintList"></datalist>
+        <button type="submit" aria-label="Buscar">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Buscar</span>
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <main class="container" id="gallery-container">
+    <div id="message-area" class="message-area">Ingresa tu cédula para ver tus fotos.</div>
+    <div id="gallery-grid"></div>
+  </main>
+  
+  <!-- BARRA DE ACCIONES DE SELECCIÓN -->
+  <div id="selection-bar">
+    <div class="selection-bar-content">
+      <div class="selection-info">
+        <span id="selection-count">0</span>/6 seleccionadas
+      </div>
+      <div class="selection-actions">
+        <button id="copy-link" class="btn">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
+          Copiar enlace
+        </button>
+        <button id="download-zip" class="btn primary">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Descargar
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- LIGHTBOX / VISOR MODAL -->
+  <div id="lightbox">
+    <img id="lightbox-img" src="" alt="Vista ampliada">
+    <button id="lightbox-close" class="lightbox-close" aria-label="Cerrar"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="12"></line></svg></button>
+    <button id="lightbox-prev" class="lightbox-nav lightbox-prev" aria-label="Anterior"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <button id="lightbox-next" class="lightbox-nav lightbox-next" aria-label="Siguiente"><svg class="ic" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </div>
+  
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast"></div>
+
+  <!-- PLANTILLA PARA LAS TARJETAS -->
+  <template id="photo-card-template">
+    <div class="photo-card" role="button" tabindex="0">
+      <img src="" alt="" loading="lazy">
+      <button class="selection-tick" aria-label="Seleccionar foto">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </button>
+    </div>
+  </template>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- CONFIG & STATE ---
+      const MAX_SELECTION = 6;
+      const state = {
+        galleryData: null,
+        currentAlbum: null,
+        selection: new Set(), // Almacenará los nombres de archivo
+        lightboxIndex: 0,
+        visibleFiles: [],
+      };
+
+      // --- DOM ELEMENTS ---
+      const dom = {
+        searchForm: document.getElementById('search-form'),
+        searchInput: document.getElementById('q'),
+        hintList: document.getElementById('hintList'),
+        messageArea: document.getElementById('message-area'),
+        galleryGrid: document.getElementById('gallery-grid'),
+        selectionBar: document.getElementById('selection-bar'),
+        selectionCount: document.getElementById('selection-count'),
+        copyLinkBtn: document.getElementById('copy-link'),
+        downloadZipBtn: document.getElementById('download-zip'),
+        lightbox: document.getElementById('lightbox'),
+        lightboxImg: document.getElementById('lightbox-img'),
+        lightboxClose: document.getElementById('lightbox-close'),
+        lightboxPrev: document.getElementById('lightbox-prev'),
+        lightboxNext: document.getElementById('lightbox-next'),
+        toast: document.getElementById('toast'),
+        photoCardTemplate: document.getElementById('photo-card-template'),
+      };
+      
+      // --- CORE FUNCTIONS ---
+      async function init() {
+        try {
+          const res = await fetch('gallery.json', { cache: 'no-store' });
+          if (!res.ok) throw new Error('No se pudo cargar gallery.json');
+          state.galleryData = await res.json();
+          fillHints();
+        } catch (error) {
+          console.error(error);
+          showMessage('Error al cargar la galería. Por favor, intente más tarde.');
+          return;
+        }
+
+        setupEventListeners();
+        handleDeepLink();
+      }
+
+      function setupEventListeners() {
+        dom.searchForm.addEventListener('submit', handleSearch);
+        dom.copyLinkBtn.addEventListener('click', copySelectionLink);
+        dom.downloadZipBtn.addEventListener('click', downloadSelectionAsZip);
+
+        dom.lightboxClose.addEventListener('click', closeLightbox);
+        dom.lightboxPrev.addEventListener('click', () => navigateLightbox(-1));
+        dom.lightboxNext.addEventListener('click', () => navigateLightbox(1));
+        
+        // Cierre con Escape o clic fuera
+        window.addEventListener('keydown', e => {
+            if (dom.lightbox.classList.contains('open')) {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') navigateLightbox(-1);
+                if (e.key === 'ArrowRight') navigateLightbox(1);
+            }
+        });
+      }
+      
+      // --- SEARCH & DISPLAY ---
+      function handleSearch(e) {
+        e.preventDefault();
+        const cedula = dom.searchInput.value.trim();
+        if (!cedula) return;
+
+        const album = state.galleryData.albums.find(a => a.id === cedula);
+        if (album) {
+            updateURL(cedula, []);
+            state.selection.clear();
+            renderAlbum(album);
+        } else {
+            showMessage(`No se encontraron fotos para la cédula: ${cedula}`);
+            dom.galleryGrid.innerHTML = '';
+        }
+      }
+      
+      function renderAlbum(album, initialSelection = []) {
+        state.currentAlbum = album;
+        state.visibleFiles = album.files; // En este diseño, siempre mostramos todos los archivos del album.
+        state.selection = new Set(initialSelection.slice(0, MAX_SELECTION));
+
+        dom.galleryGrid.innerHTML = '';
+        showMessage('', false);
+
+        state.visibleFiles.forEach((filename, index) => {
+          const card = createPhotoCard(album.id, filename, index);
+          dom.galleryGrid.appendChild(card);
+        });
+
+        updateSelectionBar();
+      }
+
+      function createPhotoCard(albumId, filename, index) {
+        const card = dom.photoCardTemplate.content.cloneNode(true).firstElementChild;
+        const img = card.querySelector('img');
+        const tick = card.querySelector('.selection-tick');
+        
+        const photoPath = `${state.galleryData.base.photos}${albumId}/${filename}`;
+        
+        card.dataset.filename = filename;
+        card.dataset.index = index;
+
+        // Estilo único para View Transition
+        const photoTransitionName = `photo-${albumId}-${index}`;
+        img.style.viewTransitionName = photoTransitionName;
+
+        img.src = photoPath; // Puedes agregar aquí la lógica de thumbnails si la tienes.
+        img.alt = `Foto ${index + 1}`;
+        
+        if (state.selection.has(filename)) {
+          card.classList.add('picked');
+        }
+
+        // Eventos
+        img.addEventListener('click', () => openLightbox(index, photoTransitionName));
+        tick.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleSelection(filename, card);
+        });
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openLightbox(index, photoTransitionName);
+            }
+        });
+
+        return card;
+      }
+
+      // --- SELECTION LOGIC ---
+      function toggleSelection(filename, cardElement) {
+        if (state.selection.has(filename)) {
+          state.selection.delete(filename);
+          cardElement.classList.remove('picked');
+        } else {
+          if (state.selection.size >= MAX_SELECTION) {
+            showToast(`Máximo ${MAX_SELECTION} fotos seleccionadas.`);
+            return;
+          }
+          state.selection.add(filename);
+          cardElement.classList.add('picked');
+        }
+        updateSelectionBar();
+        updateURL(state.currentAlbum.id, [...state.selection]);
+      }
+
+      function updateSelectionBar() {
+        const count = state.selection.size;
+        dom.selectionBar.classList.toggle('visible', count > 0);
+        dom.selectionCount.textContent = count;
+      }
+      
+      // --- LIGHTBOX LOGIC ---
+      function openLightbox(index, transitionName) {
+        state.lightboxIndex = index;
+        
+        // La magia de la View Transition API
+        if (!document.startViewTransition) {
+          updateLightboxImage();
+          dom.lightbox.classList.add('open');
+          return;
+        }
+
+        document.startViewTransition(() => {
+          updateLightboxImage(transitionName);
+          dom.lightbox.classList.add('open');
+        });
+      }
+      
+      function closeLightbox() {
+        const index = state.lightboxIndex;
+        const card = dom.galleryGrid.querySelector(`.photo-card[data-index='${index}']`);
+        if (!card) return; // Si no hay tarjeta visible
+        
+        const img = card.querySelector('img');
+
+        if (!document.startViewTransition) {
+          dom.lightbox.classList.remove('open');
+          return;
+        }
+        
+        document.startViewTransition(() => {
+          dom.lightboxImg.style.viewTransitionName = img.style.viewTransitionName;
+          dom.lightbox.classList.remove('open');
+        });
+      }
+
+      function updateLightboxImage(transitionName = 'photo-current') {
+        const filename = state.visibleFiles[state.lightboxIndex];
+        const path = `${state.galleryData.base.photos}${state.currentAlbum.id}/${filename}`;
+        dom.lightboxImg.src = path;
+        dom.lightboxImg.style.viewTransitionName = transitionName;
+      }
+
+      function navigateLightbox(direction) {
+        const newIndex = state.lightboxIndex + direction;
+        if (newIndex >= 0 && newIndex < state.visibleFiles.length) {
+          state.lightboxIndex = newIndex;
+          updateLightboxImage(`photo-${state.currentAlbum.id}-${newIndex}`);
+        }
+      }
+
+      // --- ACTIONS & UTILS ---
+      async function copySelectionLink() {
+        const url = new URL(window.location);
+        await navigator.clipboard.writeText(url.toString());
+        showToast('Enlace de selección copiado');
+      }
+
+      async function downloadSelectionAsZip() {
+          if (!window.JSZip) {
+              await loadScript('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js');
+          }
+          if (!window.JSZip) {
+              showToast("Error al cargar la librería para ZIP");
+              return;
+          }
+          
+          showToast('Preparando descarga...');
+          const zip = new JSZip();
+          const promises = [];
+
+          for (const filename of state.selection) {
+              const path = `${state.galleryData.base.photos}${state.currentAlbum.id}/${filename}`;
+              promises.push(
+                  fetch(path)
+                      .then(res => res.blob())
+                      .then(blob => zip.file(filename, blob))
+              );
+          }
+          
+          await Promise.all(promises);
+          
+          zip.generateAsync({ type: "blob", compression: 'DEFLATE', compressionOptions: {level: 6} }).then(blob => {
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(blob);
+              link.download = `seleccion-${state.currentAlbum.id}.zip`;
+              link.click();
+              URL.revokeObjectURL(link.href);
+          });
+      }
+
+      // --- URL & DEEP LINKING ---
+      function handleDeepLink() {
+        const params = new URLSearchParams(window.location.search);
+        const cedula = params.get('cedula');
+        const sel = params.get('sel');
+        
+        if (cedula && state.galleryData) {
+          const album = state.galleryData.albums.find(a => a.id === cedula);
+          if (album) {
+            dom.searchInput.value = cedula;
+            const selection = sel ? sel.split(',') : [];
+            renderAlbum(album, selection);
+          }
+        }
+      }
+
+      function updateURL(cedula, selection) {
+        const url = new URL(window.location);
+        url.searchParams.set('cedula', cedula);
+        if (selection.length > 0) {
+            url.searchParams.set('sel', selection.join(','));
+        } else {
+            url.searchParams.delete('sel');
+        }
+        history.pushState({}, '', url);
+      }
+      
+      // --- HELPERS ---
+      function fillHints() {
+        dom.hintList.innerHTML = state.galleryData.albums
+          .map(album => `<option value="${album.id}"></option>`)
+          .join('');
+      }
+
+      function showMessage(text, show = true) {
+        dom.messageArea.textContent = text;
+        dom.messageArea.hidden = !show;
+      }
+      
+      let toastTimer;
+      function showToast(message) {
+        clearTimeout(toastTimer);
+        dom.toast.textContent = message;
+        dom.toast.classList.add('show');
+        toastTimer = setTimeout(() => {
+            dom.toast.classList.remove('show');
+        }, 3000);
+      }
+      
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+      }
+
+      // --- LET'S GO ---
+      init();
+    });
+  </script>
+</body>
+</html>
