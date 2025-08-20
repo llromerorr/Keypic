@@ -3,27 +3,50 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>FotoID — Búsqueda por cédula</title>
-  <meta name="theme-color" content="#0b57d0">
+  <title>Promo XXX - Adolfo Valbuena Bravo — Fotos</title>
+  <meta name="theme-color" content="#ffffff">
   <style>
+    /* ===== Material 3 (tokens básicos + mapeo a tus vars) ===== */
     :root{
-      --bg:#f7f9fc;
-      --surface:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --brand:#0b57d0;
-      --brand-2:#0847ac;
-      --border:#e5e7eb;
-      --radius:14px;
+      /* Paleta base clara y legible */
+      --m3-primary: #2563eb;      /* Azul accesible */
+      --m3-on-primary: #ffffff;
+      --m3-secondary: #5b6b8c;
+      --m3-tertiary: #8a4be0;
+      --m3-surface: #ffffff;      /* Fondo claro */
+      --m3-on-surface: #0f172a;   /* Texto oscuro */
+      --m3-outline: #e5e7eb;
+
+      /* Tema base */
+      --bg: color-mix(in oklab, var(--m3-surface) 98%, var(--m3-primary) 2%);
+      --surface: var(--m3-surface);
+      --text: var(--m3-on-surface);
+      --muted:#475569;
+      --brand: var(--m3-primary);
+      --brand-2: color-mix(in oklab, var(--m3-primary) 85%, black);
+      --border: var(--m3-outline);
+      --radius:16px;
       --shadow:0 8px 30px rgba(2,6,23,0.08);
-      --focus:0 0 0 3px rgba(11,87,208,.18);
+      --focus:0 0 0 3px color-mix(in oklab, var(--m3-primary) 22%, transparent);
+      --control-h: 44px; /* altura unificada para input/botones */
       color-scheme: light;
     }
+
+    /* Tipografía MD3 (mapeo rápido) */
+    :root{
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --display: 700 36px/1.15 var(--font);
+      --headline: 700 24px/1.2 var(--font);
+      --title: 700 18px/1.25 var(--font);
+      --body: 400 16px/1.55 var(--font);
+      --label: 600 14px/1.4 var(--font);
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font: var(--body);
       background:var(--bg);
       color:var(--text);
       -webkit-font-smoothing:antialiased;
@@ -51,9 +74,9 @@
     .bg-scrim{
       position:absolute; inset:0; z-index:0;
       background:
-        radial-gradient(1200px 600px at 40% -10%, rgba(11,87,208,.20), transparent 60%),
-        radial-gradient(1000px 600px at 100% 0%, rgba(11,87,208,.18), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.88));
+        radial-gradient(1200px 600px at 40% -10%, rgba(37,99,235,.12), transparent 60%),
+        radial-gradient(1000px 600px at 100% 0%, rgba(37,99,235,.10), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.9));
       pointer-events:none;
     }
     @media (max-width: 768px){
@@ -61,7 +84,7 @@
     }
 
     .search-card{
-      width:min(720px, 92vw);
+      width:min(760px, 92vw);
       background:var(--surface);
       border:1px solid var(--border);
       box-shadow:var(--shadow);
@@ -71,74 +94,143 @@
     }
     .app-title{
       display:flex;align-items:center;gap:10px;
-      font-weight:800;font-size:18px;color:var(--text);margin-bottom:10px;letter-spacing:.2px
+      font: var(--title);
+      color:var(--text);margin-bottom:10px;letter-spacing:.2px
     }
     .app-dot{width:10px;height:10px;border-radius:50%;background:var(--brand)}
     .hint{color:var(--muted);font-size:14px;margin:2px 0 16px}
 
+    /* Campo de búsqueda unificado (input + recientes + buscar) */
     .field{
       position:relative;
       display:grid;
-      grid-template-columns:1fr auto;
+      grid-template-columns: 1fr auto auto; /* input | recientes | buscar */
       gap:10px; align-items:center;
     }
     .input{
       width:100%;
       border:1px solid var(--border);
       border-radius:14px;
-      padding:14px 14px 14px 44px;
-      outline:0;font-size:16px;background:var(--surface);color:var(--text);
-      box-shadow: 0 1px 0 rgba(2,6,23,0.02) inset;
+      padding:0 14px 0 44px;
+      outline:0;background:var(--surface);color:var(--text);
+      box-shadow: none;
+      font: var(--body);
+      height: var(--control-h);
     }
     .input:focus{box-shadow:var(--focus);border-color:transparent}
     .ic-left{
       position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted)
     }
     .btn{
-      border:0; background:#e8efff; color:#0b57d0;
-      font-weight:700; letter-spacing:.2px;
-      padding:12px 14px;border-radius:12px;cursor:pointer;display:inline-grid;grid-auto-flow:column;gap:8px;align-items:center;
+      border:0; background:#e8efff; color:#1e3a8a;
+      font: var(--label);
+      letter-spacing:.2px;
+      padding:0 14px; border-radius:12px; cursor:pointer;
+      display:inline-grid; grid-auto-flow:column; gap:8px; align-items:center; justify-content:center;
+      position: relative; overflow: hidden;
+      height: var(--control-h);
     }
+    .btn:not(.icon){ min-width:110px; }
     .btn.primary{background:var(--brand);color:#fff}
     .btn.primary:hover{background:var(--brand-2)}
-    .btn.tonal{background:#e8efff;color:#0b57d0}
-    .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.26)}
-    .btn.icon{padding:10px; border-radius:10px; min-width:40px; min-height:40px}
+    .btn.tonal{
+      background: color-mix(in oklab, var(--brand) 14%, var(--surface));
+      color: var(--brand);
+      border: 1px solid color-mix(in oklab, var(--brand) 18%, var(--surface));
+    }
+    .btn.ghost{background:transparent;color:#111827;border:1px solid rgba(0,0,0,.12)}
+    .btn.icon{
+      padding:0; border-radius:12px; min-width:var(--control-h); min-height:var(--control-h);
+      width: var(--control-h); height: var(--control-h);
+      background: color-mix(in oklab, var(--brand) 10%, var(--surface));
+      color: var(--brand);
+      border: 1px solid color-mix(in oklab, var(--brand) 16%, var(--surface));
+    }
+    .btn.icon:hover{ background: color-mix(in oklab, var(--brand) 14%, var(--surface)); }
     .btn:focus-visible{outline:var(--focus)}
     .btn:disabled{opacity:.55;cursor:not-allowed}
     .ic{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
-    /* Pantalla 2: collage + bottom app bar */
+    /* Menú de cédulas recientes */
+    .history-pop{
+      position:absolute; top: calc(100% + 8px); right: 0; z-index: 20;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow);
+      padding: 6px; min-width: 220px;
+    }
+    .history-pop .h-item{
+      display:block; width:100%; text-align:left; border:0; background:transparent; cursor:pointer;
+      padding:8px 10px; border-radius:8px; font: var(--body); color: var(--text);
+    }
+    .history-pop .h-item:hover{
+      background: color-mix(in oklab, var(--brand) 12%, var(--surface));
+      color: var(--brand);
+    }
+    .history-pop .empty{ padding:8px 10px; color: var(--muted); }
+
+    /* Ripple MD3 */
+    .ripple{
+      position:absolute; inset:auto;
+      width:10px;height:10px;border-radius:999px;pointer-events:none;
+      background: currentColor; opacity:.18; transform:translate(-50%,-50%) scale(0);
+      animation:ripple .55s ease-out forwards;
+      mix-blend-mode: multiply;
+    }
+    @keyframes ripple{
+      to { opacity:0; transform:translate(-50%,-50%) scale(26); }
+    }
+
+    /* Pantalla 2: top bar + Masonry */
     .bar-top{
-      position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.86) 100%);
-      backdrop-filter:saturate(1.2) blur(6px);
+      position:sticky;top:0;z-index:10;background:color-mix(in oklab, var(--surface) 92%, transparent);
+      backdrop-filter:saturate(1.2) blur(8px);
       border-bottom:1px solid var(--border);
     }
-    .bar-top .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0}
-    .title{font-weight:800;letter-spacing:.2px;font-size:18px;color:var(--text)}
+    .bar-top .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 0; flex-direction:column}
+    .title{font: var(--title);letter-spacing:.2px;color:var(--text)}
     .subtitle{color:var(--muted);font-size:13px}
+
+    /* Masonry layout (CSS columns) */
     .grid{
-      display:grid; gap:10px;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      column-width: 220px;   /* ancho objetivo de columna */
+      column-gap: 12px;
       padding:14px 0 90px;
     }
+    @media (max-width:1100px){ .grid{ column-width: 200px } }
+    @media (max-width:768px){ .grid{ column-width: 160px } }
+    @media (max-width:420px){ .grid{ column-width: 140px } }
+
     .card{
       position:relative;border-radius:14px;overflow:hidden;
       border:1px solid var(--border); background:#fff; cursor:pointer;
       transition:transform .12s ease, box-shadow .12s ease;
+      display:inline-block; width:100%;  /* necesario para columns */
+      margin:0 0 12px; break-inside: avoid;
+      /* performance */
+      content-visibility:auto; contain-intrinsic-size: 240px 180px;
     }
     .card:hover{transform:translateY(-2px)}
-    .card img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#f1f5f9}
+    .card img{width:100%;height:auto;object-fit:cover;background:#f1f5f9; opacity:0; transition: opacity .24s ease;}
+    .card[data-loaded="true"] img{ opacity:1; }
+
+    .skel{
+      position:absolute; inset:0; background:
+        linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.08), rgba(0,0,0,0.04));
+      background-size: 200% 100%;
+      animation: shimmer 1.1s infinite;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
     .pick{
       position:absolute;top:8px;right:8px; z-index:2;
       width:30px;height:30px;border-radius:999px;display:grid;place-items:center;
-      background:rgba(255,255,255,.96); color:#0b57d0; border:1px solid var(--border);
+      background:rgba(255,255,255,.96); color:#2563eb; border:1px solid var(--border);
       box-shadow:var(--shadow)
     }
     .card[data-picked="true"]{outline:3px solid #dbe8ff;outline-offset:-3px}
     .chip{
       position:absolute; bottom:8px; right:8px; z-index:2;
-      background:#0b57d0;color:#fff;font-weight:800;font-size:12px;border-radius:999px;padding:4px 8px;display:none
+      background:#2563eb;color:#fff;font-weight:800;font-size:12px;border-radius:999px;padding:4px 8px;display:none
     }
     .card[data-picked="true"] .chip{display:inline-block}
     .empty{color:var(--muted);text-align:center;padding:28px 0}
@@ -147,13 +239,14 @@
       position:fixed;left:0;right:0;bottom:0;z-index:20;
       display:flex;align-items:center;justify-content:center;
       padding:10px 14px;
-      background:linear-gradient(0deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.82) 100%);
+      background:linear-gradient(0deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.9) 100%);
       backdrop-filter:saturate(1.2) blur(8px);
       border-top:1px solid var(--border);
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
     .bottom-inner{
       width:100%;max-width:1100px;display:flex;align-items:center;gap:12px;justify-content:space-between;
+      flex-wrap:wrap;
     }
     .sel-info{font-weight:700;color:var(--text)}
     .muted{color:var(--muted)}
@@ -163,7 +256,7 @@
       display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 8px;
       border-bottom:1px solid var(--border)
     }
-    .link-title{font-size:18px;font-weight:800}
+    .link-title{font: var(--title); font-weight:800}
     .link-note{color:var(--muted);font-size:13px}
 
     /* Visor (lightbox) */
@@ -181,16 +274,20 @@
     .v-pos{
       color:#fff; font-weight:800; text-align:center;
       min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+      font: var(--label);
     }
     .v-stage{
       min-height:0; display:flex; align-items:center; justify-content:center;
-      position:relative; padding:10px;
+      position:relative; padding:10px; overflow:hidden;
     }
     .v-stage img{
       max-width:100%; max-height:100%;
       width:auto; height:auto; object-fit:contain; border-radius:12px; background:#0b0f1a;
       box-shadow: 0 10px 40px rgba(0,0,0,.35);
+      transition: opacity .22s ease;
     }
+    .v-stage[data-loading="true"] img{ opacity:.0; }
+
     /* Flechas laterales (solo desktop) */
     .nav{
       position:absolute; top:50%; transform:translateY(-50%);
@@ -227,16 +324,11 @@
       opacity:0;transition:opacity .2s;z-index:200;display:none;font-weight:600
     }
 
-    @media (max-width:768px){
-      .grid{grid-template-columns: repeat(2, 1fr)}
-    }
     @media (prefers-reduced-motion:reduce){
       *{animation-duration:.01ms !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
     }
 
     /* ========= Mejoras de selección + caja de enlace ========= */
-
-    /* Estado activo del botón seleccionar (grid + visor) */
     .pick[aria-pressed="true"],
     #vPick[aria-pressed="true"]{
       background: var(--brand);
@@ -247,13 +339,12 @@
     /* Badge en el visor cuando la foto está seleccionada */
     .v-selected-badge{
       position:absolute; top:12px; right:12px; z-index:3;
-      background:#0b57d0; color:#fff; font-weight:800; font-size:12px;
+      background:#2563eb; color:#fff; font-weight:800; font-size:12px;
       border-radius:999px; padding:4px 8px; display:none;
     }
     .v-stage[data-picked="true"] .v-selected-badge{ display:inline-block }
 
     /* Caja para mostrar el enlace compartible */
-    .bottom-inner{ flex-wrap:wrap }
     .link-out{
       display:flex; align-items:center; gap:8px;
       background:#f5f7ff; border:1px solid var(--border);
@@ -262,6 +353,10 @@
     .link-out input{
       flex:1; min-width:0; border:0; background:transparent;
       font-size:13px; color:var(--text);
+    }
+
+    @media (max-width:360px){
+      .btn:not(.icon){ min-width:96px; padding:0 12px }
     }
   </style>
 </head>
@@ -273,30 +368,53 @@
     <div class="bg-scrim" aria-hidden="true"></div>
 
     <div class="search-card">
-      <div class="app-title"><span class="app-dot"></span> FotoID</div>
+      <div class="app-title"><span class="app-dot"></span> Promo XXX - Adolfo Valbuena Bravo</div>
       <div class="hint">Busca por cédula para ver tus fotos y seleccionarlas.</div>
       <div class="field">
         <span class="ic-left">
           <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
         <input id="q" class="input" inputmode="numeric" pattern="\d*" placeholder="Ej: 123456789" autocomplete="off">
+        <button id="recentHomeBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histHome" title="Cédulas recientes">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </button>
         <button id="go" class="btn primary" aria-label="Buscar">
           <svg class="ic" viewBox="0 0 24 24"><path d="M10 18l6-6-6-6"/></svg> Buscar
         </button>
+
+        <!-- Menú de recientes (home) -->
+        <div id="histHome" class="history-pop hidden" role="menu" aria-label="Cédulas recientes"></div>
       </div>
       <datalist id="hintList"></datalist>
     </div>
   </section>
 
-  <!-- Screen 2: Grid con selección -->
+  <!-- Screen 2: Masonry con selección -->
   <section id="screen-grid" class="hidden">
     <div class="bar-top">
       <div class="wrap">
         <div class="row">
-          <div>
-            <div class="title" id="ttl">Cédula —</div>
-            <div class="subtitle muted">Toca para ver grande y usa ✓ para seleccionar</div>
+          <div class="title">Promo XXX - Adolfo Valbuena Bravo</div>
+          <div id="ttl" class="subtitle muted">Cédula —</div>
+
+          <!-- Campo superior con el mismo layout -->
+          <div class="field" style="width:100%;max-width:560px;">
+            <span class="ic-left">
+              <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input id="qTop" class="input" inputmode="numeric" pattern="\d*" placeholder="Buscar cédula">
+            <button id="recentTopBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histTop" title="Cédulas recientes">
+              <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </button>
+            <button id="goTop" class="btn tonal">
+              <svg class="ic" viewBox="0 0 24 24"><path d="M10 18l6-6-6-6"/></svg> Buscar
+            </button>
+
+            <!-- Menú de recientes (top bar) -->
+            <div id="histTop" class="history-pop hidden" role="menu" aria-label="Cédulas recientes"></div>
           </div>
+
+          <div class="subtitle muted">Toca para ver grande y usa ✓ para seleccionar</div>
         </div>
       </div>
     </div>
@@ -409,6 +527,9 @@
 
     const els = {
       q: $('#q'), go: $('#go'),
+      recentHomeBtn: $('#recentHomeBtn'), histHome: $('#histHome'),
+      recentTopBtn: $('#recentTopBtn'), histTop: $('#histTop'),
+
       ttl: $('#ttl'), grid: $('#grid'), err: $('#error'),
       selCount: $('#selCount'), copySel: $('#copySel'),
       linkCed: $('#linkCed'), gridLink: $('#gridLink'), emptyLink: $('#emptyLink'),
@@ -416,8 +537,6 @@
       toast: $('#toast'),
       hints: $('#hintList'),
       bg: $('#bgCollage'),
-
-      // Share box
       shareBox: $('#shareBox'), shareInput: $('#shareInput'), copyAgain: $('#copyAgain'),
 
       // Viewer
@@ -446,10 +565,21 @@
       view: { source: null, idx: 0 } // 'grid' | 'link'
     };
 
+    // Caché del visor
+    let viewerAbort;
+    const viewerCache = new Map();
+    const VIEWER_CACHE_LIMIT = 40;
+
+    // Historial de cédulas
+    const HISTORY_KEY = 'cedHistory';
+
     // Init
     init();
 
     async function init(){
+      // Dynamic Theme forzado a claro
+      installDynamicTheme();
+
       // Solo dígitos
       els.q.addEventListener('input', function(){
         const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
@@ -457,6 +587,20 @@
       els.go.addEventListener('click', onSearch);
       els.q.addEventListener('keydown', (e)=>{ if(e.key==='Enter') onSearch(); });
 
+      // Top search (AppBar)
+      const qTop = document.getElementById('qTop');
+      const goTop = document.getElementById('goTop');
+      qTop?.addEventListener('input', function(){
+        const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+      });
+      goTop?.addEventListener('click', ()=>{ if(qTop.value) search(qTop.value.trim(), true); });
+      qTop?.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && qTop.value) search(qTop.value.trim(), true); });
+
+      // Menús de recientes
+      attachRecentMenu(els.recentHomeBtn, els.histHome, els.q);
+      attachRecentMenu(els.recentTopBtn, els.histTop, qTop);
+
+      // Copiar/descargar
       els.copySel.addEventListener('click', copySelection);
       els.dlSel.addEventListener('click', downloadLinkZip);
 
@@ -476,14 +620,42 @@
       els.vPick.addEventListener('click', togglePickFromViewer);
       window.addEventListener('keydown', onKey);
 
+      // Ripple global
+      document.addEventListener('pointerdown', e=>{
+        const el = e.target.closest('.btn, .card');
+        if(!el) return;
+        const r = document.createElement('span');
+        r.className = 'ripple';
+        const rect = el.getBoundingClientRect();
+        r.style.left = `${e.clientX - rect.left}px`;
+        r.style.top = `${e.clientY - rect.top}px`;
+        el.appendChild(r);
+        setTimeout(()=> r.remove(), 600);
+      }, { passive:true });
+
       // Carga datos
       state.data = await loadGallery();
       fillHints(state.data);
       renderHomeBackground(state.data);
 
+      // Preparar historial inicial (si existe)
+      updateHistoryMenus();
+
       // Enrutado simple por query
       routeFromURL();
       window.addEventListener('popstate', routeFromURL);
+
+      // Service Worker para caché de imágenes
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      }
+
+      // Cerrar menús si clic afuera
+      document.addEventListener('click', (e)=>{
+        if(!e.target.closest('.history-pop, [aria-controls="histHome"], [aria-controls="histTop"]')){
+          hideHistoryMenus();
+        }
+      });
     }
 
     function setScreen(name){
@@ -513,6 +685,8 @@
       if(!els.hints) return;
       els.hints.innerHTML = (data.albums||[]).map(a=>`<option value="${a.id}"></option>`).join('');
       els.q.setAttribute('list','hintList');
+      const qTop = document.getElementById('qTop');
+      qTop?.setAttribute('list','hintList');
     }
 
     function thumbPath(folder, name, baseThumbs){
@@ -551,7 +725,7 @@
       }
     }
 
-    async function search(id, pushHistory){
+    async function search(id, pushHistoryFlag){
       const a = (state.data.albums||[]).find(x => x.id === id);
       if(!a){ showErr('No encontramos esa cédula.'); setScreen('home'); return; }
       clearErr();
@@ -570,11 +744,12 @@
       renderGrid();
       setScreen('grid');
 
-      if(pushHistory){
+      if(pushHistoryFlag){
         const u = new URL(location.href);
         u.search = ''; u.searchParams.set('cedula', id);
         history.pushState({}, '', u);
       }
+      rememberCed(id);
       window.scrollTo({top:0, behavior:'smooth'});
     }
 
@@ -592,11 +767,20 @@
         card.dataset.picked = 'false';
 
         const t = state.thumbs[i];
-        const img = new Image();
-        img.loading = 'lazy'; img.decoding = 'async';
-        img.src = t.src; img.srcset = t.srcset; img.sizes = t.sizes;
+
+        const skel = document.createElement('div');
+        skel.className = 'skel';
+
+        const img = document.createElement('img');
+        img.decoding = 'async';
         img.alt = `Foto ${i+1}`;
+        img.setAttribute('fetchpriority','low');
+        img.dataset.src = t.src;
+        img.dataset.srcset = t.srcset;
+        img.dataset.sizes = t.sizes;
         img.addEventListener('error', () => { img.removeAttribute('srcset'); img.src = state.full[i]; });
+
+        observeLazy(img, card);
 
         const pick = document.createElement('button');
         pick.className = 'pick';
@@ -611,11 +795,34 @@
         badge.textContent = 'Seleccionada';
 
         card.addEventListener('click', () => openViewerAt('grid', i));
-        card.append(img, pick, badge);
+        card.append(img, skel, pick, badge);
         frag.appendChild(card);
       });
       els.grid.appendChild(frag);
       updateSelInfo();
+    }
+
+    let io;
+    function observeLazy(img, card){
+      if(!io){
+        io = new IntersectionObserver(async entries=>{
+          for(const e of entries){
+            if(!e.isIntersecting) continue;
+            const el = e.target; io.unobserve(el);
+            const parentCard = el.closest('.card');
+            try{
+              el.src = el.dataset.src;
+              if(el.dataset.srcset) el.srcset = el.dataset.srcset;
+              if(el.dataset.sizes) el.sizes = el.dataset.sizes;
+              await (el.decode?.() || new Promise(r=> el.onload = r));
+              parentCard?.setAttribute('data-loaded','true');
+            }catch{
+              parentCard?.setAttribute('data-loaded','true');
+            }
+          }
+        },{ rootMargin: '600px 0px' });
+      }
+      io.observe(img);
     }
 
     function togglePick(i, cardEl){
@@ -639,7 +846,6 @@
     function updateSelInfo(){
       const n = state.picked.size;
       els.selCount.textContent = String(n);
-      // si el visor está abierto en modo grid, actualizar el contador visible
       if(state.view.source==='grid'){
         els.vSelCount.textContent = String(n);
       }
@@ -655,10 +861,8 @@
       u.searchParams.set('sel', encodeSel(names));
       const link = u.toString();
 
-      // Mostrar siempre para copia manual
       showShareBox(link);
 
-      // Copiar con fallback
       const ok = await copyText(link);
       toast(ok ? 'Enlace copiado' : 'No se pudo copiar. Copia manualmente.');
     }
@@ -706,14 +910,23 @@
       for(let i=0;i<n;i++){
         const card = document.createElement('div');
         card.className = 'card';
+
+        const skel = document.createElement('div');
+        skel.className = 'skel';
+
         const t = state.linkThumbs[i];
-        const img = new Image();
-        img.loading = 'lazy'; img.decoding='async';
-        img.src = t.src; img.srcset = t.srcset; img.sizes = t.sizes;
+        const img = document.createElement('img');
+        img.decoding='async';
         img.alt = `Foto seleccionada ${i+1}`;
+        img.setAttribute('fetchpriority','low');
+        img.dataset.src = t.src;
+        img.dataset.srcset = t.srcset;
+        img.dataset.sizes = t.sizes;
         img.addEventListener('error', ()=>{ img.removeAttribute('srcset'); img.src = state.linkUrls[i]; });
+        observeLazy(img, card);
+
         card.addEventListener('click', () => openViewerAt('link', i));
-        card.append(img);
+        card.append(img, skel);
         frag.appendChild(card);
       }
       els.gridLink.appendChild(frag);
@@ -782,7 +995,6 @@
       if(!els.shareBox) return;
       els.shareInput.value = link;
       els.shareBox.classList.remove('hidden');
-      // Seleccionar el texto para que sea fácil copiarlo en móvil
       els.shareInput.focus({ preventScroll:true });
       els.shareInput.select();
     }
@@ -832,54 +1044,9 @@
       return { names: state.files, urls: state.full, thumbs: state.thumbs, ced: state.album?.id || '' };
     }
 
-    function updateViewer(){
-      const { names, urls, thumbs } = currentArrays();
-      const i = state.view.idx = clampIndex(state.view.idx, urls.length);
-      if(!urls.length){ closeViewer(); return; }
-
-      // Pre-carga mini y luego grande
-      const t = thumbs[i];
-      els.vImg.src = t?.src || urls[i];
-      const big = new Image();
-      big.decoding = 'async';
-      big.onload = () => { els.vImg.src = urls[i]; };
-      big.src = urls[i];
-
-      // Posición
-      els.vPos.textContent = `${i+1}/${urls.length}`;
-
-      // Botón seleccionar visible solo en 'grid'
-      const isGrid = state.view.source === 'grid';
-      els.vPick.classList.toggle('hidden', !isGrid);
-      els.vSelWrap.classList.toggle('hidden', !isGrid);
-      if(isGrid){
-        els.vSelCount.textContent = String(state.picked.size);
-        syncViewerPickButton();
-      }else{
-        els.vStage.dataset.picked = 'false';
-        els.vPick.setAttribute('aria-pressed','false');
-      }
-
-      // Prefetch vecinos
-      const a = (i + 1) % urls.length;
-      const b = (i - 1 + urls.length) % urls.length;
-      [a,b].forEach(j=>{
-        const l = document.createElement('link');
-        l.rel='prefetch'; l.as='image'; l.href = urls[j];
-        document.head.appendChild(l);
-      });
-    }
-
     function clampIndex(i, len){
       if(len<=0) return 0;
       return (i + len) % len;
-    }
-
-    function nav(delta){
-      const { urls } = currentArrays();
-      if(!urls.length) return;
-      state.view.idx = clampIndex(state.view.idx + delta, urls.length);
-      updateViewer();
     }
 
     function onKey(e){
@@ -931,6 +1098,83 @@
       syncViewerPickButton();
     }
 
+    // ========= Precarga robusta + caché del visor =========
+    function cacheDecode(url, priority='high'){
+      if(viewerCache.has(url)) return viewerCache.get(url);
+      const p = new Promise(async (resolve, reject)=>{
+        try{
+          const img = new Image();
+          img.decoding = 'async';
+          if('fetchPriority' in img) img.fetchPriority = priority;
+          img.src = url;
+          await (img.decode?.() || new Promise(r=> img.onload = r));
+          resolve(img);
+        }catch(err){ reject(err); }
+      });
+      viewerCache.set(url, p);
+      if(viewerCache.size > VIEWER_CACHE_LIMIT){
+        const first = viewerCache.keys().next().value;
+        viewerCache.delete(first);
+      }
+      return p;
+    }
+    function prefetch(url){
+      cacheDecode(url, 'low').catch(()=>{});
+    }
+    async function setViewerSource(url){
+      viewerAbort?.abort();
+      const ctrl = new AbortController();
+      viewerAbort = ctrl;
+      els.vStage.setAttribute('data-loading','true');
+      try{
+        await cacheDecode(url, 'high');
+        if(ctrl.signal.aborted) return;
+        els.vImg.src = url; // swap tras decode => sin parpadeo
+      }finally{
+        els.vStage.removeAttribute('data-loading');
+      }
+    }
+
+    function updateViewer(){
+      const { urls, thumbs } = currentArrays();
+      const i = state.view.idx = clampIndex(state.view.idx, urls.length);
+      if(!urls.length){ closeViewer(); return; }
+
+      // Mostrar thumbnail inmediato como placeholder
+      const t = thumbs[i];
+      if(t?.src) els.vImg.src = t.src;
+
+      // Cargar imagen grande con decode + swap
+      setViewerSource(urls[i]);
+
+      // Posición
+      els.vPos.textContent = `${i+1}/${urls.length}`;
+
+      // Botón seleccionar visible solo en 'grid'
+      const isGrid = state.view.source === 'grid';
+      els.vPick.classList.toggle('hidden', !isGrid);
+      els.vSelWrap.classList.toggle('hidden', !isGrid);
+      if(isGrid){
+        els.vSelCount.textContent = String(state.picked.size);
+        syncViewerPickButton();
+      }else{
+        els.vStage.dataset.picked = 'false';
+        els.vPick.setAttribute('aria-pressed','false');
+      }
+
+      // Precarga vecinos
+      const a = (i + 1) % urls.length;
+      const b = (i - 1 + urls.length) % urls.length;
+      prefetch(urls[a]); prefetch(urls[b]);
+    }
+
+    function nav(delta){
+      const { urls } = currentArrays();
+      if(!urls.length) return;
+      state.view.idx = clampIndex(state.view.idx + delta, urls.length);
+      updateViewer();
+    }
+
     /* ========== Fondo: collage en pantalla de inicio ========== */
     function renderHomeBackground(manifest){
       const root = els.bg;
@@ -962,6 +1206,93 @@
         });
       }
       return out;
+    }
+
+    /* ===== Historial de cédulas ===== */
+    function getHistory(){
+      try{
+        const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        return Array.isArray(arr) ? arr.filter(x => typeof x === 'string') : [];
+      }catch{ return []; }
+    }
+    function saveHistory(arr){
+      try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch{}
+    }
+    function rememberCed(id){
+      if(!id) return;
+      let arr = getHistory();
+      arr = [id, ...arr.filter(x => x !== id)];
+      if(arr.length > 8) arr = arr.slice(0, 8);
+      saveHistory(arr);
+      updateHistoryMenus();
+    }
+    function updateHistoryMenus(){
+      fillHistoryMenu(els.histHome, els.q);
+      const qTop = document.getElementById('qTop');
+      fillHistoryMenu(els.histTop, qTop);
+    }
+    function fillHistoryMenu(menuEl, inputEl){
+      if(!menuEl) return;
+      const items = getHistory();
+      if(!items.length){
+        menuEl.innerHTML = '<div class="empty">Sin recientes</div>';
+        return;
+      }
+      menuEl.innerHTML = items.map(id => `<button type="button" class="h-item" data-id="${id}">${id}</button>`).join('');
+      menuEl.querySelectorAll('.h-item').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          if(inputEl){ inputEl.value = btn.dataset.id || ''; inputEl.focus(); }
+          hideHistoryMenus();
+        });
+      });
+    }
+    function attachRecentMenu(btn, menu, input){
+      if(!btn || !menu) return;
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        hideHistoryMenus();
+        if(!isOpen){
+          menu.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+    function hideHistoryMenus(){
+      [els.histHome, els.histTop].forEach(m=> m?.classList.add('hidden'));
+      [els.recentHomeBtn, els.recentTopBtn].forEach(b=> b?.setAttribute('aria-expanded','false'));
+    }
+
+    // ===== Material You Dynamic Color (forzado a claro) =====
+    const PROMO_SEED = '#2563eb';
+    async function installDynamicTheme(){
+      try{
+        const { argbFromHex, themeFromSourceColor, applyTheme } = await import('https://cdn.jsdelivr.net/npm/@material/material-color-utilities@0.3.0/+esm');
+        const theme = themeFromSourceColor(argbFromHex(PROMO_SEED));
+        applyTheme(theme, { target: document.documentElement, dark: false }); // siempre claro
+
+        const css = getComputedStyle(document.documentElement);
+        const get = n => css.getPropertyValue(n).trim();
+        document.documentElement.style.setProperty('--m3-primary', get('--md-sys-color-primary'));
+        document.documentElement.style.setProperty('--m3-on-primary', get('--md-sys-color-on-primary'));
+        document.documentElement.style.setProperty('--m3-secondary', get('--md-sys-color-secondary'));
+        document.documentElement.style.setProperty('--m3-tertiary', get('--md-sys-color-tertiary'));
+        document.documentElement.style.setProperty('--m3-surface', get('--md-sys-color-surface'));
+        document.documentElement.style.setProperty('--m3-on-surface', get('--md-sys-color-on-surface'));
+        document.documentElement.style.setProperty('--m3-outline', get('--md-sys-color-outline-variant') || get('--md-sys-color-outline'));
+
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if(meta) meta.setAttribute('content', get('--md-sys-color-surface'));
+      }catch{}
+    }
+
+    /* Utilidades varias */
+    function showShareBox(link){
+      if(!els.shareBox) return;
+      els.shareInput.value = link;
+      els.shareBox.classList.remove('hidden');
+      els.shareInput.focus({ preventScroll:true });
+      els.shareInput.select();
     }
   </script>
 </body>
