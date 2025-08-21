@@ -368,24 +368,31 @@
     <div class="bg-scrim" aria-hidden="true"></div>
 
     <div class="search-card">
-      <div class="app-title"><span class="app-dot"></span> Promo XXX - Adolfo Valbuena Bravo</div>
+      <div class="title"><span class="app-dot"></span>Adolfo Valbuena Bravo<br>Promo XXX</div>
       <div class="hint">Busca por cédula para ver tus fotos y seleccionarlas.</div>
+      
       <div class="field">
+
         <span class="ic-left">
-          <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg class="ic" viewBox="0 0 24 17"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
-        <input id="q" class="input" inputmode="numeric" pattern="\d*" placeholder="Ej: 123456789" autocomplete="off">
-        <button id="recentHomeBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histHome" title="Cédulas recientes">
+
+        <input id="q" class="input" inputmode="numeric" pattern="\d*" placeholder="Ej: 35785214" autocomplete="off">
+        
+        <!-- <button id="recentHomeBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histHome" title="Cédulas recientes">
           <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        </button>
+        </button> -->
+        
         <button id="go" class="btn primary" aria-label="Buscar">
-          <svg class="ic" viewBox="0 0 24 24"><path d="M10 18l6-6-6-6"/></svg> Buscar
+          <svg class="ic" viewBox="0 0 24 24"><path d="M10 18l6-6-6-6"/></svg>
+          Buscar 
         </button>
 
         <!-- Menú de recientes (home) -->
         <div id="histHome" class="history-pop hidden" role="menu" aria-label="Cédulas recientes"></div>
       </div>
-      <datalist id="hintList"></datalist>
+
+      <!-- <datalist id="hintList"></datalist> -->
     </div>
   </section>
 
@@ -494,7 +501,7 @@
     <!-- Pie: navegación móvil + contador selección -->
     <div class="v-foot">
       <button id="vPrevM" class="btn">Anterior</button>
-      <div id="vSelWrap" class="v-pill">Seleccionadas: <span id="vSelCount">0</span></div>
+      <div id="vSelWrap" class="v-pill">Seleccion: <span id="vSelCount">0</span></div>
       <button id="vNextM" class="btn">Siguiente</button>
     </div>
   </div>
