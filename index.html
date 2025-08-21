@@ -190,34 +190,38 @@
     .title{font: var(--title);letter-spacing:.2px;color:var(--text)}
     .subtitle{color:var(--muted);font-size:13px}
 
-    /* Masonry layout (CSS columns) */
+    /* Masonry layout con CSS Grid (estable) */
     .grid{
-      column-width: 220px;   /* ancho objetivo de columna */
-      column-gap: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-auto-rows: 8px;   /* unidad base */
+      gap: 12px;
       padding:14px 0 90px;
+      align-items: start;
+      overflow-anchor: none; /* reduce saltos de anclaje */
     }
-    @media (max-width:1100px){ .grid{ column-width: 200px } }
-    @media (max-width:768px){ .grid{ column-width: 160px } }
-    @media (max-width:420px){ .grid{ column-width: 140px } }
+    @media (max-width:1100px){ .grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) } }
+    @media (max-width:768px){  .grid{ grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) } }
+    @media (max-width:420px){  .grid{ grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) } }
 
     .card{
       position:relative;border-radius:14px;overflow:hidden;
       border:1px solid var(--border); background:#fff; cursor:pointer;
       transition:transform .12s ease, box-shadow .12s ease;
-      display:inline-block; width:100%;  /* necesario para columns */
-      margin:0 0 12px; break-inside: avoid;
-      /* performance */
-      content-visibility:auto; contain-intrinsic-size: 240px 180px;
+      display:block; width:auto; margin:0; /* el grid maneja ancho y espacios */
+      /* Importante: sin content-visibility/contain-intrinsic-size para medir bien */
     }
     .card:hover{transform:translateY(-2px)}
     .card img{width:100%;height:auto;object-fit:cover;background:#f1f5f9; opacity:0; transition: opacity .24s ease;}
     .card[data-loaded="true"] img{ opacity:1; }
+    .card[data-loaded="true"] .skel{ display:none; }
 
     .skel{
       position:absolute; inset:0; background:
         linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.08), rgba(0,0,0,0.04));
       background-size: 200% 100%;
       animation: shimmer 1.1s infinite;
+      pointer-events: none; /* no bloquear clics */
     }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
@@ -580,6 +584,36 @@
     // Historial de cédulas
     const HISTORY_KEY = 'cedHistory';
 
+    // ===== Masonry con Grid: estado y helpers =====
+    let io;
+    const lazyCtx = new WeakMap(); // img -> gridEl
+
+    function gridMetrics(el){
+      const cs = getComputedStyle(el);
+      const rowH = parseFloat(cs.getPropertyValue('grid-auto-rows')) || 8;
+      const gapY = parseFloat(cs.getPropertyValue('row-gap')) ||
+                   parseFloat(cs.getPropertyValue('grid-row-gap')) ||
+                   parseFloat(cs.getPropertyValue('gap')) || 0;
+      return { rowH, gapY };
+    }
+
+    function fitCardToGrid(card, gridEl){
+      if(!gridEl || !card || gridEl.offsetWidth === 0) return;
+      const { rowH, gapY } = gridMetrics(gridEl);
+      const h = card.offsetHeight;
+      const span = Math.max(1, Math.ceil((h + gapY) / (rowH + gapY)));
+      card.style.gridRowEnd = 'span ' + span;
+    }
+
+    function relayoutGrid(gridEl){
+      if(!gridEl) return;
+      gridEl.querySelectorAll('.card').forEach(card => fitCardToGrid(card, gridEl));
+    }
+
+    const debounce = (fn, ms=120) => {
+      let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+    };
+
     // Init
     init();
 
@@ -663,6 +697,12 @@
           hideHistoryMenus();
         }
       });
+
+      // Relayout en resize
+      window.addEventListener('resize', debounce(()=>{
+        relayoutGrid(els.grid);
+        relayoutGrid(els.gridLink);
+      }, 120));
     }
 
     function setScreen(name){
@@ -670,6 +710,10 @@
       screens[name].classList.remove('hidden');
       // Ocultar caja de compartir fuera del grid
       if(name !== 'grid') els.shareBox?.classList.add('hidden');
+
+      // Relayout cuando se muestra una pantalla con grid visible
+      if(name === 'grid') requestAnimationFrame(()=> relayoutGrid(els.grid));
+      if(name === 'link') requestAnimationFrame(()=> relayoutGrid(els.gridLink));
     }
 
     async function loadGallery(){
@@ -787,7 +831,7 @@
         img.dataset.sizes = t.sizes;
         img.addEventListener('error', () => { img.removeAttribute('srcset'); img.src = state.full[i]; });
 
-        observeLazy(img, card);
+        observeLazy(img, card, els.grid);
 
         const pick = document.createElement('button');
         pick.className = 'pick';
@@ -807,16 +851,20 @@
       });
       els.grid.appendChild(frag);
       updateSelInfo();
+
+      // Intento de layout inicial (por si hay imágenes en caché)
+      requestAnimationFrame(()=> relayoutGrid(els.grid));
     }
 
-    let io;
-    function observeLazy(img, card){
+    function observeLazy(img, card, gridEl){
       if(!io){
         io = new IntersectionObserver(async entries=>{
           for(const e of entries){
             if(!e.isIntersecting) continue;
             const el = e.target; io.unobserve(el);
             const parentCard = el.closest('.card');
+            const grid = lazyCtx.get(el);
+
             try{
               el.src = el.dataset.src;
               if(el.dataset.srcset) el.srcset = el.dataset.srcset;
@@ -825,10 +873,13 @@
               parentCard?.setAttribute('data-loaded','true');
             }catch{
               parentCard?.setAttribute('data-loaded','true');
+            }finally{
+              if(parentCard && grid) fitCardToGrid(parentCard, grid);
             }
           }
         },{ rootMargin: '600px 0px' });
       }
+      lazyCtx.set(img, gridEl);
       io.observe(img);
     }
 
@@ -909,8 +960,8 @@
 
     function renderLinkGrid(){
       const n = state.linkNames.length;
-      els.gridLink.innerHTML = '';
       els.emptyLink.classList.toggle('hidden', n > 0);
+      els.gridLink.innerHTML = '';
       if(!n) return;
 
       const frag = document.createDocumentFragment();
@@ -930,13 +981,15 @@
         img.dataset.srcset = t.srcset;
         img.dataset.sizes = t.sizes;
         img.addEventListener('error', ()=>{ img.removeAttribute('srcset'); img.src = state.linkUrls[i]; });
-        observeLazy(img, card);
+        observeLazy(img, card, els.gridLink);
 
         card.addEventListener('click', () => openViewerAt('link', i));
         card.append(img, skel);
         frag.appendChild(card);
       }
       els.gridLink.appendChild(frag);
+
+      requestAnimationFrame(()=> relayoutGrid(els.gridLink));
     }
 
     async function downloadLinkZip(){
@@ -1291,15 +1344,6 @@
         const meta = document.querySelector('meta[name="theme-color"]');
         if(meta) meta.setAttribute('content', get('--md-sys-color-surface'));
       }catch{}
-    }
-
-    /* Utilidades varias */
-    function showShareBox(link){
-      if(!els.shareBox) return;
-      els.shareInput.value = link;
-      els.shareBox.classList.remove('hidden');
-      els.shareInput.focus({ preventScroll:true });
-      els.shareInput.select();
     }
   </script>
 </body>
