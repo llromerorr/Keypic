@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2025-08-21T17:00:27.526Z",
+  "generatedAt": "2025-08-22T18:14:43.039Z",
   "base": {
     "photos": "./photos/",
     "thumbs": "./thumbs/"
@@ -488,9 +488,10 @@
     },
     {
       "id": "32984809",
-      "cover": "IMG_0039.JPG",
-      "count": 24,
+      "cover": "IMG_0038.JPG",
+      "count": 25,
       "files": [
+        "IMG_0038.JPG",
         "IMG_0039.JPG",
         "IMG_0040.JPG",
         "IMG_9521.JPG",
