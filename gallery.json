@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2025-08-22T18:14:43.039Z",
+  "generatedAt": "2025-08-23T01:32:46.880Z",
   "base": {
     "photos": "./photos/",
     "thumbs": "./thumbs/"
@@ -333,11 +333,12 @@
     {
       "id": "33181433",
       "cover": "IMG_0009.JPG",
-      "count": 40,
+      "count": 42,
       "files": [
         "IMG_0009.JPG",
         "IMG_0018.JPG",
         "IMG_0037.JPG",
+        "IMG_0046.JPG",
         "IMG_0047.JPG",
         "IMG_0048.JPG",
         "IMG_0085.JPG",
@@ -373,6 +374,7 @@
         "IMG_9817.JPG",
         "IMG_9818.JPG",
         "IMG_9819.JPG",
+        "IMG_9821.JPG",
         "IMG_9994.JPG",
         "IMG_9995.JPG"
       ]
