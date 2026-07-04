@@ -376,6 +376,72 @@
     #themeToggleGrid {
       display: none;
     }
+
+    .contact-toggle {
+      position: fixed; top: 16px; left: 16px; z-index: 50;
+      background: var(--m3-surface); color: var(--m3-on-surface);
+      border: 1px solid var(--m3-outline);
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .contact-toggle svg {
+      width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2;
+    }
+    .contact-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .contact-modal-overlay.show {
+      opacity: 1; pointer-events: auto;
+    }
+    .contact-modal-card {
+      background: var(--m3-surface); color: var(--m3-on-surface);
+      border: 1px solid var(--m3-outline); box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+      border-radius: 20px; width: 90%; max-width: 440px; padding: 24px;
+      position: relative; transform: scale(0.9); transition: transform 0.3s ease;
+    }
+    .contact-modal-overlay.show .contact-modal-card {
+      transform: scale(1);
+    }
+    .contact-modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; transition: background 0.2s;
+    }
+    .contact-modal-close:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+    .contact-modal-close svg {
+      width: 20px; height: 20px; fill: currentColor;
+    }
+    .contact-modal-logo {
+      max-height: 40px; width: auto; object-fit: contain;
+    }
+    .contact-modal-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    }
+    .contact-modal-title {
+      font: var(--title); font-size: 1.25rem; margin: 0;
+    }
+    .contact-modal-desc {
+      color: var(--muted); font-size: 0.9rem; line-height: 1.4; margin: 0 0 20px 0;
+    }
+    .contact-modal-list {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .c-item {
+      display: flex; align-items: center; gap: 12px; font-size: 0.9rem; color: var(--text);
+      word-break: break-all; overflow-wrap: anywhere;
+    }
+    .c-icon {
+      width: 18px; height: 18px; fill: none; stroke: var(--brand); stroke-width: 2; flex-shrink: 0;
+    }
   
     .skeleton-wrap {
       background: #e2e8f0;
@@ -484,6 +550,51 @@
     <svg id="icMoon" class="ic moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
   </button>
 
+  <button id="contactToggle" class="contact-toggle hidden" aria-label="Información de contacto" title="Información de contacto">
+    <svg class="ic" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+  </button>
+
+  <!-- Modal de Contacto del Estudio (Glassmorphic) -->
+  <div id="contactModal" class="contact-modal-overlay" aria-hidden="true">
+    <div class="contact-modal-card">
+      <button id="closeContact" class="contact-modal-close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+      
+      <div class="contact-modal-body">
+        <div class="contact-modal-header">
+          <img id="contactModalLogo" src="" alt="Logo" class="contact-modal-logo">
+          <h2 id="contactModalTitle" class="contact-modal-title"></h2>
+        </div>
+        
+        <p id="contactModalDesc" class="contact-modal-desc"></p>
+        
+        <div class="contact-modal-list">
+          <div id="mPhone" class="c-item hidden">
+            <svg class="c-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span id="txtMPhone"></span>
+          </div>
+          <div id="mMail" class="c-item hidden">
+            <svg class="c-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span id="txtMMail"></span>
+          </div>
+          <div id="mInsta" class="c-item hidden">
+            <svg class="c-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            <span id="txtMInsta"></span>
+          </div>
+          <div id="mFb" class="c-item hidden">
+            <svg class="c-icon" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            <span id="txtMFb"></span>
+          </div>
+          <div id="mAddr" class="c-item hidden">
+            <svg class="c-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span id="txtMAddr"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   
 
   <!-- Screen 1: Solo buscador con fondo -->
@@ -522,9 +633,12 @@
           Buscar 
         </button>
 
-        <!-- Menú de recientes (home) -->
         <div id="histHome" class="history-pop hidden" role="menu" aria-label="Cédulas recientes"></div>
       </div>
+
+      <div id="homeError" class="empty hidden" style="color:#ef4444; font-size:0.9rem; font-weight:600; text-align:center; margin-top:16px; background:rgba(239,68,68,0.08); padding:8px 12px; border-radius:8px; border:1px solid rgba(239,68,68,0.15);"></div>
+
+
 
       <!-- <datalist id="hintList"></datalist> -->
     </div>
@@ -755,6 +869,7 @@
       recentTopBtn: $('#recentTopBtn'), histTop: $('#histTop'),
 
       themeToggle: $('#themeToggle'), icSun: $('#icSun'), icMoon: $('#icMoon'),
+      contactToggle: $('#contactToggle'),
       ttl: $('#ttl'), grid: $('#grid'), err: $('#error'),
       selCount: $('#selCount'), copySel: $('#copySel'),
       dlSelDirect: $('#dlSelDirect'), dlSelZip: $('#dlSelZip'),
@@ -921,6 +1036,105 @@
         if (mainHint) mainHint.textContent = conf.textoAyuda;
       }
 
+      // Renderizar información de contacto dinámica si existe en la configuración (en el modal)
+      let hasContact = false;
+      const cToggle = document.getElementById('contactToggle');
+      const cModal = document.getElementById('contactModal');
+      
+      if (cModal && cToggle) {
+        // Rellenar Logo
+        const mLogo = document.getElementById('contactModalLogo');
+        if (mLogo) mLogo.src = configBaseURL + '/resources/logo.png?t=' + Date.now();
+        
+        // Rellenar Título
+        const mTitle = document.getElementById('contactModalTitle');
+        if (mTitle) mTitle.textContent = title;
+        
+        // Rellenar Descripción
+        const mDesc = document.getElementById('contactModalDesc');
+        if (mDesc) {
+          if (conf.descripcionEstudio) {
+            mDesc.textContent = conf.descripcionEstudio;
+            mDesc.style.display = 'block';
+            hasContact = true;
+          } else {
+            mDesc.style.display = 'none';
+          }
+        }
+        
+        // Rellenar Teléfono
+        const mPhone = document.getElementById('mPhone');
+        const txtPhone = document.getElementById('txtMPhone');
+        if (mPhone && txtPhone) {
+          if (conf.telefono) {
+            txtPhone.textContent = conf.telefono;
+            mPhone.classList.remove('hidden');
+            hasContact = true;
+          } else {
+            mPhone.classList.add('hidden');
+          }
+        }
+
+        // Rellenar Correo
+        const mMail = document.getElementById('mMail');
+        const txtMail = document.getElementById('txtMMail');
+        if (mMail && txtMail) {
+          if (conf.correo) {
+            txtMail.textContent = conf.correo;
+            mMail.classList.remove('hidden');
+            hasContact = true;
+          } else {
+            mMail.classList.add('hidden');
+          }
+        }
+
+        // Rellenar Instagram
+        const mInsta = document.getElementById('mInsta');
+        const txtInsta = document.getElementById('txtMInsta');
+        if (mInsta && txtInsta) {
+          if (conf.instagram) {
+            txtInsta.textContent = conf.instagram;
+            mInsta.classList.remove('hidden');
+            hasContact = true;
+          } else {
+            mInsta.classList.add('hidden');
+          }
+        }
+
+        // Rellenar Facebook
+        const mFb = document.getElementById('mFb');
+        const txtFb = document.getElementById('txtMFb');
+        if (mFb && txtFb) {
+          if (conf.facebook) {
+            txtFb.textContent = conf.facebook;
+            mFb.classList.remove('hidden');
+            hasContact = true;
+          } else {
+            mFb.classList.add('hidden');
+          }
+        }
+
+        // Rellenar Dirección
+        const mAddr = document.getElementById('mAddr');
+        const txtAddr = document.getElementById('txtMAddr');
+        if (mAddr && txtAddr) {
+          if (conf.direccion) {
+            txtAddr.textContent = conf.direccion;
+            mAddr.classList.remove('hidden');
+            hasContact = true;
+          } else {
+            mAddr.classList.add('hidden');
+          }
+        }
+
+        state.hasContactData = hasContact;
+        if (hasContact) {
+          cToggle.classList.remove('hidden');
+        } else {
+          cToggle.classList.add('hidden');
+        }
+      }
+
       // Enlazar imágenes de marca (ahora cargan desde el túnel)
       const tParam = '?t=' + Date.now();
       const bImg = document.getElementById('appBanner');
@@ -943,6 +1157,7 @@
       // Solo dígitos
       els.q.addEventListener('input', function(){
         const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+        clearErr();
       });
       els.go.addEventListener('click', onSearch);
       els.q.addEventListener('keydown', (e)=>{ if(e.key==='Enter') onSearch(); });
@@ -956,6 +1171,27 @@
       };
       els.themeToggle?.addEventListener('click', toggleTheme);
       document.getElementById('themeToggleGrid')?.addEventListener('click', toggleTheme);
+
+      // Contact info modal toggles
+      const openContact = () => {
+        const modal = document.getElementById('contactModal');
+        if (modal) {
+          modal.classList.add('show');
+          modal.setAttribute('aria-hidden', 'false');
+        }
+      };
+      const closeContact = () => {
+        const modal = document.getElementById('contactModal');
+        if (modal) {
+          modal.classList.remove('show');
+          modal.setAttribute('aria-hidden', 'true');
+        }
+      };
+      els.contactToggle?.addEventListener('click', openContact);
+      document.getElementById('closeContact')?.addEventListener('click', closeContact);
+      document.getElementById('contactModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'contactModal') closeContact();
+      });
 
       // Clear selection button
       document.getElementById('clearSelectionBtn')?.addEventListener('click', () => {
@@ -976,6 +1212,7 @@
       const goTop = document.getElementById('goTop');
       qTop?.addEventListener('input', function(){
         const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+        clearErr();
       });
       goTop?.addEventListener('click', ()=>{ if(qTop.value) search(qTop.value.trim(), true); });
       document.getElementById('searchIconBtn')?.addEventListener('click', ()=>{ if(qTop && qTop.value) search(qTop.value.trim(), true); });
@@ -1134,6 +1371,15 @@
           els.themeToggle.style.display = (name === 'home') ? 'flex' : 'none';
         } else {
           els.themeToggle.style.display = 'flex';
+        }
+      }
+
+      // Ocultar botón de contacto flotante si no tiene datos o fuera de la pantalla de inicio
+      if (els.contactToggle) {
+        if (state.hasContactData && name === 'home') {
+          els.contactToggle.style.display = 'flex';
+        } else {
+          els.contactToggle.style.display = 'none';
         }
       }
 
@@ -1549,8 +1795,28 @@
       setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
     }
 
-    function showErr(msg){ els.err.textContent = msg; els.err.classList.remove('hidden'); }
-    function clearErr(){ els.err.textContent = ''; els.err.classList.add('hidden'); }
+    function showErr(msg){
+      const homeErr = document.getElementById('homeError');
+      if (homeErr) {
+        homeErr.innerHTML = msg;
+        homeErr.classList.remove('hidden');
+      }
+      if (els.err) {
+        els.err.textContent = msg;
+        els.err.classList.remove('hidden');
+      }
+    }
+    function clearErr(){
+      const homeErr = document.getElementById('homeError');
+      if (homeErr) {
+        homeErr.innerHTML = '';
+        homeErr.classList.add('hidden');
+      }
+      if (els.err) {
+        els.err.textContent = '';
+        els.err.classList.add('hidden');
+      }
+    }
 
     function toast(msg){
       const t = els.toast;
