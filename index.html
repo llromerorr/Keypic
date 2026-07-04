@@ -1,0 +1,1905 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1.0,user-scalable=no">
+  <title>Promo XXX - Adolfo Valbuena Bravo — Fotos</title>
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    /* ===== Material 3 (tokens básicos + mapeo a tus vars) ===== */
+    :root{
+      /* Paleta base clara y legible */
+      --m3-primary: #2563eb;      /* Azul accesible */
+      --m3-on-primary: #ffffff;
+      --m3-secondary: #5b6b8c;
+      --m3-tertiary: #8a4be0;
+      --m3-surface: #ffffff;      /* Fondo claro */
+      --m3-on-surface: #0f172a;   /* Texto oscuro */
+      --m3-outline: #e5e7eb;
+
+      /* Tema base */
+      --bg: color-mix(in oklab, var(--m3-surface) 98%, var(--m3-primary) 2%);
+      --surface: var(--m3-surface);
+      --text: var(--m3-on-surface);
+      --muted: color-mix(in srgb, var(--m3-on-surface) 65%, transparent);
+      --brand: #2563eb;
+      --brand-2: #1d4ed8;
+      --border: var(--m3-outline);
+      --radius:16px;
+      --shadow:0 8px 30px rgba(2,6,23,0.08);
+      --focus:0 0 0 3px color-mix(in oklab, var(--m3-primary) 22%, transparent);
+      --control-h: 44px; /* altura unificada para input/botones */
+      color-scheme: light;
+    }
+
+    /* Tipografía MD3 (mapeo rápido) */
+    :root{
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --display: 700 36px/1.15 var(--font);
+      --headline: 700 24px/1.2 var(--font);
+      --title: 700 18px/1.25 var(--font);
+      --body: 400 16px/1.55 var(--font);
+      --label: 600 14px/1.4 var(--font);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font: var(--body);
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    img{image-orientation:from-image; display:block; max-width:100%; user-select:none; -webkit-user-drag:none;}
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:clamp(12px,3vw,20px)}
+    .center{display:grid;place-items:center}
+    .hidden{display:none !important}
+
+    /* Pantalla 1: solo buscador, con collage de fondo */
+    .screen{min-height:100dvh; display:grid; grid-template-rows: 1fr; position:relative; overflow:hidden}
+    .bg-collage{
+      position:absolute; inset:0; z-index:0;
+      display:grid; grid-template-columns: repeat(6, 1fr); gap:5px; padding:5px;
+      filter:saturate(1.05) blur(0.5px);
+      opacity:0.9;
+      pointer-events:none;
+    }
+    .bg-collage img{
+      width:100%; height:100%;
+      object-fit:cover; border-radius:10px; background:#eaeef6;
+      opacity: 0; transition: opacity 0.8s ease;
+    }
+    .bg-scrim{
+      position:absolute; inset:0; z-index:0;
+      background:
+        radial-gradient(1200px 600px at 40% -10%, rgba(37,99,235,.12), transparent 60%),
+        radial-gradient(1000px 600px at 100% 0%, rgba(37,99,235,.10), transparent 55%),
+        linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface) 90%, transparent));
+      pointer-events:none;
+    }
+    @media (max-width: 768px){
+      .bg-collage{grid-template-columns: repeat(4, 1fr)}
+    }
+
+    .search-card{
+      width:min(760px, 92vw);
+      background:var(--surface);
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      border-radius:24px;
+      padding:22px;
+      z-index:1;
+    }
+    .app-title{
+      display:flex;align-items:center;gap:10px;
+      font: var(--title);
+      color:var(--text);margin-bottom:10px;letter-spacing:.2px
+    }
+    .app-dot{width:10px;height:10px;border-radius:50%;background:var(--brand)}
+    .hint{color:var(--muted);font-size:14px;margin:2px 0 16px}
+
+    /* Campo de búsqueda unificado (input + recientes + buscar) */
+    .field{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1fr auto auto; /* input | recientes | buscar */
+      gap:10px; align-items:center;
+    }
+    .input{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:0 14px 0 44px;
+      outline:0;background:var(--surface);color:var(--text);
+      box-shadow: none;
+      font: var(--body);
+      height: var(--control-h);
+    }
+    .input:focus{box-shadow:var(--focus);border-color:transparent}
+    .ic-left{
+      position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted)
+    }
+    .btn{
+      border:0; background:#e8efff; color:#1e3a8a;
+      font: var(--label);
+      letter-spacing:.2px;
+      padding:0 14px; border-radius:12px; cursor:pointer;
+      display:inline-grid; grid-auto-flow:column; gap:8px; align-items:center; justify-content:center;
+      position: relative; overflow: hidden;
+      height: var(--control-h);
+    }
+    .btn:not(.icon){ min-width:110px; }
+    .btn.primary{background:var(--brand);color:#fff; border-color:var(--brand)}
+    .btn.primary:hover{background:var(--brand-2)}
+    .btn.tonal{
+      background: color-mix(in oklab, var(--m3-primary) 14%, var(--surface));
+      color: var(--m3-primary);
+      border: 1px solid color-mix(in oklab, var(--m3-primary) 18%, var(--surface));
+    }
+    .btn.tonal:hover{ background: color-mix(in oklab, var(--m3-primary) 22%, var(--surface)); }
+    .btn.ghost{background:transparent;color:#111827;border:1px solid rgba(0,0,0,.12)}
+    .btn.icon{
+      width:44px;height:44px;border-radius:999px;padding:0;
+      color:var(--text); background: color-mix(in srgb, var(--text) 8%, transparent);
+    }
+    .btn.icon:hover{ background: color-mix(in srgb, var(--text) 16%, transparent); }
+    .btn:focus-visible{outline:var(--focus)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .ic{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Menú de cédulas recientes */
+    .history-pop{
+      position:absolute; top: calc(100% + 8px); right: 0; z-index: 20;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow);
+      padding: 6px; min-width: 220px;
+    }
+    .history-pop .h-item{
+      display:block; width:100%; text-align:left; border:0; background:transparent; cursor:pointer;
+      padding:8px 10px; border-radius:8px; font: var(--body); color: var(--text);
+    }
+    .history-pop .h-item:hover{
+      background: color-mix(in oklab, var(--m3-primary) 12%, var(--surface));
+      color: var(--m3-primary);
+    }
+    .history-pop .empty{ padding:8px 10px; color: var(--muted); }
+
+    /* Ripple MD3 */
+    .ripple{
+      position:absolute; inset:auto;
+      width:10px;height:10px;border-radius:999px;pointer-events:none;
+      background: currentColor; opacity:.18; transform:translate(-50%,-50%) scale(0);
+      animation:ripple .55s ease-out forwards;
+      mix-blend-mode: multiply;
+    }
+    @keyframes ripple{
+      to { opacity:0; transform:translate(-50%,-50%) scale(26); }
+    }
+
+    /* Pantalla 2: top bar + Masonry */
+    .bar-top{
+      position:sticky;top:0;z-index:10;background:color-mix(in oklab, var(--surface) 92%, transparent);
+      backdrop-filter:saturate(1.2) blur(8px);
+      border-bottom:1px solid var(--border);
+    }
+    .bar-top .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 0; flex-direction:column}
+    .title{font: var(--title);letter-spacing:.2px;color:var(--text)}
+    .subtitle{color:var(--muted);font-size:13px}
+
+    /* Masonry layout con CSS Grid (estable) */
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-auto-rows: 8px;   /* unidad base */
+      gap: 12px;
+      padding:14px 0 90px;
+      align-items: start;
+      overflow-anchor: none; /* reduce saltos de anclaje */
+    }
+    @media (max-width:1100px){ .grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) } }
+    @media (max-width:768px){  .grid{ grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) } }
+    @media (max-width:420px){  .grid{ grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) } }
+
+    .card{
+      position:relative;border-radius:14px;overflow:hidden;
+      border:1px solid var(--border); background:#fff; cursor:pointer;
+      transition:transform .12s ease, box-shadow .12s ease;
+      display:block; width:auto; margin:0; /* el grid maneja ancho y espacios */
+      /* Importante: sin content-visibility/contain-intrinsic-size para medir bien */
+    }
+    .card:hover{transform:translateY(-2px)}
+    .card img{width:100%;height:auto;object-fit:cover;background:#f1f5f9; opacity:0; transition: opacity .24s ease;}
+    .card[data-loaded="true"] img{ opacity:1; }
+    .card[data-loaded="true"] .skel{ display:none; }
+
+    .skel{
+      position:absolute; inset:0; background:
+        linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.08), rgba(0,0,0,0.04));
+      background-size: 200% 100%;
+      animation: shimmer 1.1s infinite;
+      pointer-events: none; /* no bloquear clics */
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .pick{
+      position:absolute;top:8px;right:8px; z-index:2;
+      width:30px;height:30px;border-radius:999px;display:grid;place-items:center; padding:0;
+      background: color-mix(in srgb, var(--surface) 96%, transparent); color: var(--m3-primary); border: 1px solid var(--border);
+      box-shadow:var(--shadow)
+    }
+    .card[data-picked="true"]{outline:3px solid var(--brand);outline-offset:-3px}
+    .chip{
+      position:absolute; bottom:8px; right:8px; z-index:2;
+      background:#2563eb;color:#fff;font-weight:800;font-size:12px;border-radius:999px;padding:4px 8px;display:none
+    }
+    .card[data-picked="true"] .chip{display:inline-block}
+    .empty{color:var(--muted);text-align:center;padding:28px 0}
+
+        .bottom-bar{
+      position:fixed;left:0;right:0;bottom:0;z-index:20;
+      display:flex;align-items:center;justify-content:center;
+      padding:10px 14px;
+      background:linear-gradient(0deg, color-mix(in srgb, var(--surface) 98%, transparent) 0%, color-mix(in srgb, var(--surface) 90%, transparent) 100%);
+      backdrop-filter:saturate(1.2) blur(8px);
+      border-top:1px solid var(--border);
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+    
+    
+    .sel-info{font-weight:700;color:var(--text)}
+    .muted{color:var(--muted)}
+
+    /* Pantalla de enlace (solo ver selección + descargar) */
+    .link-head{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 8px;
+      border-bottom:1px solid var(--border)
+    }
+    .link-title{font: var(--title); font-weight:800}
+    .link-note{color:var(--muted);font-size:13px}
+
+    /* Visor (lightbox) */
+    .overlay{
+      position:fixed; inset:0; z-index:100; display:none;
+      background: #000000 !important;
+    }
+    .overlay.show{display:grid; grid-template-rows:auto 1fr}
+    .v-head{
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px;
+      padding: calc(8px + env(safe-area-inset-top)) 10px 8px;
+      background: rgba(0, 0, 0, 0.4) !important; backdrop-filter: blur(6px);
+      color: #ffffff !important;
+    }
+    .v-head .btn.icon { background: rgba(255, 255, 255, 0.12) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; }
+    .v-head .btn.icon:hover { background: rgba(255, 255, 255, 0.22) !important; }
+    .v-pos{
+      color: #ffffff !important; font-weight:800; text-align:center;
+      min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+      font: var(--label);
+    }
+    .v-stage{
+      min-height:0; display:flex; align-items:center; justify-content:center;
+      position:relative; padding:0; overflow:hidden;
+      width: 100%; height: 100%;
+    }
+    .v-stage img{
+      width: 100%; height: 100%;
+      max-width: 100%; max-height: 100%;
+      object-fit: contain; border-radius: 0; background: #000000;
+      transition: opacity .22s ease, filter .22s ease;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .v-stage[data-loading="true"] img{ opacity:0.5; filter:blur(10px); }
+    
+    .v-stage::after {
+      content: ""; position: absolute;
+      width: 40px; height: 40px;
+      border: 4px solid var(--border); border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .v-stage[data-loading="true"]::after { opacity: 1; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Flechas laterales (visibles en todos los dispositivos) */
+    .nav{
+      position:absolute; top:50%; transform:translateY(-50%);
+      width:44px;height:44px;border-radius:999px;display:grid;place-items:center;
+      background: rgba(0, 0, 0, 0.3) !important; color: #fff !important; border: none !important;
+      cursor:pointer; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .nav:hover{background: rgba(0, 0, 0, 0.45) !important;}
+    .nav-left{left:14px}
+    .nav-right{right:14px}
+
+    /* Toast */
+    .toast{
+      position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+      background: var(--text); color: var(--surface); padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);
+      opacity:0;transition:opacity .2s;z-index:200;display:none;font-weight:600
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *{animation-duration:.01ms !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+    }
+
+    /* ========= Mejoras de selección + caja de enlace ========= */
+    .pick[aria-pressed="true"],
+    #vPick[aria-pressed="true"]{
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    /* Badge en el visor cuando la foto está seleccionada */
+    .v-selected-badge{
+      position:absolute; top:12px; right:12px; z-index:3;
+      background:#2563eb; color:#fff; font-weight:800; font-size:12px;
+      border-radius:999px; padding:4px 8px; display:none;
+    }
+    .v-stage[data-picked="true"] .v-selected-badge{ display:inline-block }
+
+    /* Caja para mostrar el enlace compartible */
+    .link-out{
+      display:flex; align-items:center; gap:8px;
+      background: color-mix(in srgb, var(--brand) 8%, var(--surface)); border:1px solid var(--border);
+      padding:8px 10px; border-radius:12px; max-width:100%;
+    }
+    .link-out input{
+      flex:1; min-width:0; border:0; background:transparent;
+      font-size:13px; color:var(--text);
+    }
+
+    @media (max-width:360px){
+      .btn:not(.icon){ min-width:96px; padding:0 12px }
+    }
+
+    /* Personalizacion del cliente */
+    .app-banner { width: 100%; height: auto; border-radius: 16px; margin-bottom: 20px; display: block; }
+    .app-logo { max-height: 48px; width: auto; object-fit: contain; vertical-align: middle; margin-right: 12px; }
+    .title-wrapper { display: flex; align-items: center; }
+    .app-desc { color: var(--muted); font-size: 15px; line-height: 1.4; margin-bottom: 16px; margin-top: 4px; }
+    
+        .theme-toggle {
+      position: fixed; top: 16px; right: 16px; z-index: 50;
+      background: var(--m3-surface); color: var(--m3-on-surface);
+      border: 1px solid var(--m3-outline);
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    #themeToggleGrid {
+      display: none;
+    }
+  
+    .skeleton-wrap {
+      background: #e2e8f0;
+      background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+      background-size: 200% 100%;
+      animation: 1.5s shine linear infinite;
+    }
+    .skeleton-text {
+      color: transparent !important;
+      background: #e2e8f0;
+      background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+      background-size: 200% 100%;
+      animation: 1.5s shine linear infinite;
+      border-radius: 4px;
+    }
+    .hidden { opacity: 0; }
+    @keyframes shine {
+      to { background-position-x: -200%; }
+    }
+    .sun-icon { display: block; }
+    .moon-icon { display: none; }
+    [data-theme="dark"] {
+      --m3-surface: #000000 !important;
+      --bg: #000000 !important;
+      --surface: #000000 !important;
+      --m3-outline: #1c1c1e !important;
+      --border: #1c1c1e !important;
+      --m3-on-surface: #f4f4f5 !important;
+      --text: #f4f4f5 !important;
+      --muted: #a1a1aa !important;
+    }
+    [data-theme="dark"] .btn.tonal {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    }
+    [data-theme="dark"] .btn.tonal:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+    }
+    [data-theme="dark"] .sun-icon { display: none !important; }
+    [data-theme="dark"] .moon-icon { display: block !important; }
+    [data-theme="light"] .sun-icon { display: block !important; }
+    [data-theme="light"] .moon-icon { display: none !important; }
+
+    @media (max-width: 600px) {
+      html, body { overflow-x: hidden; }
+
+      .field {
+        grid-template-columns: 1fr auto auto !important;
+        gap: 8px !important;
+      }
+      .field > .btn.primary, .field > .btn.tonal {
+        grid-column: auto !important;
+        width: auto !important;
+        min-width: 44px !important;
+        padding: 0 10px !important;
+        font-size: 13px !important;
+      }
+      .ic-left { top: 50% !important; transform: translateY(-50%) !important; }
+
+      /* Mobile: compact top bar - single row search only */
+      #normalHeader .top-bar-header { display: none !important; }
+      #goTop { display: none !important; }
+      #themeToggleGrid { display: inline-flex !important; }
+      .bar-top .row { padding: 4px 0 !important; gap: 0 !important; }
+      .bar-top .field { max-width: 100% !important; margin: 0 !important; }
+
+      /* Hide floating theme toggle and navigation arrows on mobile */
+      .theme-toggle { display: none !important; }
+      .nav { display: none !important; }
+
+      /* Mobile selection header compact styling */
+      #selectionHeader .sel-info { font-size: 13px !important; white-space: nowrap; }
+      #selectionHeader #dlSelDirect { display: none !important; }
+      #selectionHeader #dlSelZip {
+        font-size: 0 !important;
+        width: 44px !important;
+        min-width: 44px !important;
+        height: 44px !important;
+        padding: 0 !important;
+        border-radius: 999px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: var(--brand) !important;
+        color: #fff !important;
+        border: none !important;
+        gap: 0 !important;
+      }
+      #selectionHeader #dlSelZip .ic {
+        display: block !important;
+      }
+
+      /* Prevent horizontal overflow */
+      .search-card { max-width: 100vw; }
+      .v-head, .v-foot { padding-left: 8px; padding-right: 8px; }
+    }
+
+
+
+</style>
+</head>
+<body>
+  <button id="themeToggle" class="theme-toggle" aria-label="Cambiar tema" title="Cambiar tema">
+    <svg id="icSun" class="ic sun-icon" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+    <svg id="icMoon" class="ic moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+  </button>
+
+  
+
+  <!-- Screen 1: Solo buscador con fondo -->
+    <section id="screen-splash" class="screen center">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+      <div class="spinner" style="width:40px;height:40px;border-width:3px;"></div>
+      <div style="color:var(--muted); font-weight:500; letter-spacing:1px; text-transform:uppercase; font-size:0.85rem;">Conectando...</div>
+    </div>
+  </section>
+
+  <!-- Screen 1: Solo buscador con fondo -->
+  <section id="screen-home" class="screen center hidden">
+    <div id="bgCollage" class="bg-collage" aria-hidden="true"></div>
+    <div class="bg-scrim" aria-hidden="true"></div>
+
+    <div class="search-card">
+      <img src="" alt="Banner" class="app-banner" id="appBanner">
+      <div class="title title-wrapper">
+        <img src="" alt="Logo" class="app-logo" id="appLogo">
+        <span id="mainTitle"></span>
+      </div>
+      <div class="app-desc" id="mainDesc"></div>
+      <div class="hint" id="mainHint">Busca por cédula para ver tus fotos y seleccionarlas.</div>
+      
+      <div class="field">
+        <span class="ic-left">
+          <svg class="ic" viewBox="0 0 24 17"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <input id="q" class="input" inputmode="numeric" pattern="\d*" placeholder="Ej: 35785214" autocomplete="off">
+        
+        <!-- <button id="recentHomeBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histHome" title="Cédulas recientes">
+          <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </button> -->
+        
+        <button id="go" class="btn primary" aria-label="Buscar">
+          Buscar 
+        </button>
+
+        <!-- Menú de recientes (home) -->
+        <div id="histHome" class="history-pop hidden" role="menu" aria-label="Cédulas recientes"></div>
+      </div>
+
+      <!-- <datalist id="hintList"></datalist> -->
+    </div>
+  </section>
+
+  <!-- Screen Offline: Servidor no disponible -->
+  <section id="screen-offline" class="screen center hidden">
+    <div class="search-card" style="text-align:center; padding: 40px 20px;">
+      <svg class="ic" viewBox="0 0 24 24" style="width:64px;height:64px;stroke:var(--muted);margin:0 auto 16px;display:block;"><path d="M6 10H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2"/><path d="M6 6h.01"/><path d="M6 18h.01"/><path d="m13 6-4 6h6l-4 6"/></svg>
+      <h2 style="margin:0 0 8px; font:var(--title);">Servidor Fuera de Línea</h2>
+      <p class="muted" style="margin:0 0 16px;">La galería no está disponible temporalmente porque el servidor del fotógrafo está apagado.</p>
+      <p class="muted" id="offlineContact" style="margin:0;">Por favor, comunícate con tu fotógrafo para que inicie la conexión.</p>
+    </div>
+  </section>
+
+  <!-- Screen 2: Masonry con selección -->
+  <section id="screen-grid" class="hidden">
+    <div class="bar-top">
+      <div class="wrap">
+        <div class="row">
+          
+          <!-- Normal Header (cédula, title, search and theme toggle) -->
+          <div id="normalHeader" style="display:flex; flex-direction:column; width:100%; gap:10px;">
+            <div class="top-bar-header" style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:12px;">
+              <div class="title-wrapper-outer" style="display:flex; align-items:center; gap:16px; min-width:0; flex:1;">
+                <div class="title title-wrapper">
+                  <img src="resources/logo.png" alt="Logo" class="app-logo" id="topLogo" style="max-height:32px">
+                  <span id="topTitle">Promo XXX - Adolfo Valbuena Bravo</span>
+                </div>
+                <div id="ttl" class="subtitle muted" style="margin:0; white-space:nowrap;">Cédula —</div>
+              </div>
+            </div>
+
+            <!-- Campo superior con el mismo layout -->
+            <div class="field" style="width:100%;max-width:560px;">
+              <button id="searchIconBtn" class="ic-left" type="button" aria-label="Buscar" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; width:20px; height:20px; z-index:2; outline:none;">
+                <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              </button>
+              <input id="qTop" class="input" inputmode="numeric" pattern="\d*" placeholder="Buscar cédula">
+              <button id="recentTopBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histTop" title="Cédulas recientes">
+                <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </button>
+              
+              <button id="themeToggleGrid" class="btn icon" aria-label="Cambiar tema" title="Cambiar tema" style="flex-shrink:0; background:var(--m3-surface); color:var(--m3-on-surface); border:1px solid var(--m3-outline); box-shadow:0 4px 12px rgba(0,0,0,.08);">
+                <svg class="ic sun-icon" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <svg class="ic moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+              </button>
+
+              <button id="goTop" class="btn primary">
+                Buscar
+              </button>
+
+              <!-- Menú de recientes (top bar) -->
+              <div id="histTop" class="history-pop hidden" role="menu" aria-label="Cédulas recientes"></div>
+            </div>
+          </div>
+
+          <!-- Selection Header (Contextual Actions) - Hidden by default -->
+          <div id="selectionHeader" class="hidden" style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:12px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button id="clearSelectionBtn" class="btn icon" aria-label="Limpiar selección" title="Limpiar selección" style="background:transparent; border:none; color:var(--text);">
+                <svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+              <div class="sel-info" style="font-weight:700; font-size:15px; color:var(--text);">
+                Seleccionadas: <span id="selCount">0</span>
+              </div>
+            </div>
+            
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button id="dlSelDirect" class="btn primary" title="Descargar selección">
+                <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                Descargar
+              </button>
+              <button id="dlSelZip" class="btn tonal" title="Descargar ZIP">
+                <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                ZIP
+              </button>
+              <button id="copySel" class="btn icon" title="Copiar enlace">
+                <svg class="ic" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L10.5 4.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l.53-.53"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Caja con el enlace para copiar manualmente -->
+          <div id="shareBox" class="link-out hidden" style="width:100%; margin-top:8px;">
+            <input id="shareInput" readonly aria-label="Enlace para compartir">
+            <button id="copyAgain" class="btn tonal">Copiar</button>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <div id="error" class="empty hidden"></div>
+      <div id="grid" class="grid"></div>
+    </main>
+  </section>
+
+  <!-- Screen 3: Enlace compartido (solo ver selección + descargar selección) -->
+  <section id="screen-link" class="hidden">
+    <div class="wrap">
+      <div class="link-head">
+        <div>
+          <div class="link-title" id="linkCed">Cédula —</div>
+          <div class="link-note">Vista de selección</div>
+        </div>
+        <button id="dlSel" class="btn primary">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Descargar selección
+        </button>
+      </div>
+
+      <div id="gridLink" class="grid" style="padding-bottom:24px"></div>
+      <div id="emptyLink" class="empty hidden">No hay fotos seleccionadas en este enlace.</div>
+    </div>
+  </section>
+
+  <!-- Visor a pantalla completa -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <!-- Header compacto -->
+    <div class="v-head">
+      <button id="vClose" class="btn icon" aria-label="Cerrar">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div id="vPos" class="v-pos">—</div>
+      <div style="display:flex; gap:8px;">
+        <button id="vDl" class="btn icon" aria-label="Descargar foto" title="Descargar foto">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        </button>
+        <button id="vPick" class="btn icon" aria-label="Seleccionar" title="Seleccionar">
+          <svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Imagen -->
+    <div class="v-stage" id="vStage">
+      <img id="vImg" alt="">
+      <!-- Flechas laterales (desktop) -->
+      <button id="vPrev" class="nav nav-left" title="Anterior" aria-label="Anterior">
+        <svg class="ic" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button id="vNext" class="nav nav-right" title="Siguiente" aria-label="Siguiente">
+        <svg class="ic" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div id="vBadge" class="v-selected-badge">✓ Seleccionada</div>
+    </div>
+
+
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Datos embebidos (fallback) -->
+  <script id="__GALLERY__" type="application/json">
+  {
+    "version": 1,
+    "generatedAt": "2026-07-04T16:32:00Z",
+    "base": { "photos": "./photos/", "thumbs": "./thumbs/" },
+    "albums": [
+      {
+        "id": "32642770",
+        "cover": "IMG_0059.JPG",
+        "count": 39,
+        "files": [
+          "IMG_0059.JPG",
+          "IMG_0060.JPG",
+          "IMG_0061.JPG",
+          "IMG_0130.JPG",
+          "IMG_0170.JPG",
+          "IMG_0171.JPG",
+          "IMG_0172.JPG",
+          "IMG_0173.JPG",
+          "IMG_0175.JPG",
+          "IMG_0176.JPG",
+          "IMG_0177.JPG",
+          "IMG_9424.JPG",
+          "IMG_9425.JPG",
+          "IMG_9429.JPG",
+          "IMG_9431.JPG",
+          "IMG_9433.JPG",
+          "IMG_9434.JPG",
+          "IMG_9437.JPG",
+          "IMG_9438.JPG",
+          "IMG_9440.JPG",
+          "IMG_9443.JPG",
+          "IMG_9444.JPG",
+          "IMG_9445.JPG",
+          "IMG_9446.JPG",
+          "IMG_9447.JPG",
+          "IMG_9454.JPG",
+          "IMG_9457.JPG",
+          "IMG_9458.JPG",
+          "IMG_9459.JPG",
+          "IMG_9460.JPG",
+          "IMG_9462.JPG",
+          "IMG_9463.JPG",
+          "IMG_9464.JPG",
+          "IMG_9482.JPG",
+          "IMG_9696.JPG",
+          "IMG_9697.JPG",
+          "IMG_9699.JPG",
+          "IMG_9733.JPG",
+          "IMG_9734.JPG"
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <script>
+    // Utils
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+    const screens = {
+      splash: $('#screen-splash'),
+      home: $('#screen-home'),
+      grid: $('#screen-grid'),
+      link: $('#screen-link')
+    };
+
+    const els = {
+      q: $('#q'), go: $('#go'),
+      recentHomeBtn: $('#recentHomeBtn'), histHome: $('#histHome'),
+      recentTopBtn: $('#recentTopBtn'), histTop: $('#histTop'),
+
+      themeToggle: $('#themeToggle'), icSun: $('#icSun'), icMoon: $('#icMoon'),
+      ttl: $('#ttl'), grid: $('#grid'), err: $('#error'),
+      selCount: $('#selCount'), copySel: $('#copySel'),
+      dlSelDirect: $('#dlSelDirect'), dlSelZip: $('#dlSelZip'),
+      linkCed: $('#linkCed'), gridLink: $('#gridLink'), emptyLink: $('#emptyLink'),
+      dlSel: $('#dlSel'),
+      toast: $('#toast'),
+      hints: $('#hintList'),
+      bg: $('#bgCollage'),
+      shareBox: $('#shareBox'), shareInput: $('#shareInput'), copyAgain: $('#copyAgain'),
+
+      // Viewer
+      overlay: $('#overlay'), vImg: $('#vImg'),
+      vClose: $('#vClose'), vPrev: $('#vPrev'), vNext: $('#vNext'),
+      vPick: $('#vPick'), vDl: $('#vDl'), vStage: $('#vStage'),
+      vPos: $('#vPos'),
+      vBadge: $('#vBadge')
+    };
+
+    const state = {
+      data: null,
+      album: null,
+      files: [],
+      full: [],
+      thumbs: [],
+      picked: new Set(), // índices seleccionados en modo grid
+      // link view:
+      linkCed: null,
+      linkNames: [],
+      linkUrls: [],
+      linkThumbs: [],
+      // viewer
+      view: { source: null, idx: 0 } // 'grid' | 'link'
+    };
+
+    // Caché del visor
+    let viewerAbort;
+    const viewerCache = new Map();
+    const VIEWER_CACHE_LIMIT = 40;
+
+    // Historial de cédulas
+    const HISTORY_KEY = 'cedHistory';
+
+    // ===== Masonry con Grid: estado y helpers =====
+    let io;
+    let ro;
+    const lazyCtx = new WeakMap(); // img -> gridEl
+
+    function gridMetrics(el){
+      const cs = getComputedStyle(el);
+      const rowH = parseFloat(cs.getPropertyValue('grid-auto-rows')) || 8;
+      const gapY = parseFloat(cs.getPropertyValue('row-gap')) ||
+                   parseFloat(cs.getPropertyValue('grid-row-gap')) ||
+                   parseFloat(cs.getPropertyValue('gap')) || 0;
+      return { rowH, gapY };
+    }
+
+    function fitCardToGrid(card, gridEl){
+      if(!gridEl || !card || gridEl.offsetWidth === 0) return;
+      const { rowH, gapY } = gridMetrics(gridEl);
+      const img = card.querySelector('img');
+      // La tarjeta podria estar restringida por el span actual (align-self: stretch).
+      // Asi que medimos la altura real que necesita el contenido (img)
+      const h = img ? img.offsetHeight : card.offsetHeight;
+      if(h === 0) return; // Aun no ha cargado layout
+      const span = Math.max(1, Math.ceil((h + gapY) / (rowH + gapY)));
+      card.style.gridRowEnd = 'span ' + span;
+    }
+
+    function relayoutGrid(gridEl){
+      if(!gridEl) return;
+      gridEl.querySelectorAll('.card').forEach(card => fitCardToGrid(card, gridEl));
+    }
+
+    const debounce = (fn, ms=120) => {
+      let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+    };
+
+    // Init
+    init();
+
+    async function init(){
+      let apiURL = null;
+      let contactFallback = "";
+      let studioName = "Tus Fotos";
+      
+      const u = new URL(location.href);
+      const photoId = u.searchParams.get('id');
+      if(photoId){
+        try {
+          const fbRes = await fetch(`https://keypic-6e299-default-rtdb.firebaseio.com/servers/${encodeURIComponent(photoId)}.json`);
+          if(fbRes.ok){
+            const fbData = await fbRes.json();
+            if(fbData){
+              apiURL = fbData.url;
+              contactFallback = fbData.contact || "";
+              studioName = fbData.name || studioName;
+              
+              // Actualizar títulos de pestaña e interfaz de inmediato
+              document.title = studioName + ' — Fotos';
+              const mainTitle = document.getElementById('mainTitle');
+              if (mainTitle) mainTitle.textContent = studioName;
+              const topTitle = document.getElementById('topTitle');
+              if (topTitle) topTitle.textContent = studioName;
+            } else {
+              throw new Error('Fotógrafo no encontrado en la base de datos');
+            }
+          } else {
+            throw new Error('Firebase offline');
+          }
+        } catch(e) {
+          console.warn("Fallo al conectar con Firebase", e);
+          showOfflineScreen('El ID del fotógrafo no existe o la base de datos no está disponible.');
+          return; 
+        }
+      } else {
+         apiURL = u.searchParams.get('api'); // Opcional para pruebas directas
+      }
+
+      const configBaseURL = apiURL ? apiURL.replace(/\/+$/, '') : '.';
+      state.apiBase = configBaseURL;
+
+      // 2. Verificar Conexión si estamos usando un servidor de fotógrafo (URL con id)
+      if (configBaseURL !== '.') {
+         try {
+           state.data = await loadGallery(configBaseURL);
+         } catch (e) {
+           console.warn("Servidor fuera de línea al iniciar", e);
+           showOfflineScreen(contactFallback 
+             ? 'Por favor, comunícate con tu fotógrafo: <br><b style="color:var(--brand)">' + contactFallback + '</b>' 
+             : 'Por favor, comunícate con tu fotógrafo para que inicie la conexión.');
+           return;
+         }
+      } else {
+         // En modo demostración (local/estático sin id), cargamos el fallback embebido directamente
+         state.data = await loadGallery(configBaseURL);
+      }
+
+      // 3. Cargar la personalización desde el servidor del fotógrafo (si está en línea)
+      try {
+        const confRes = await fetch(configBaseURL + '/resources/config.json?t=' + Date.now(), { cache: 'no-store' });
+        if (confRes.ok) {
+          const conf = await confRes.json();
+          state.config = conf;
+        }
+      } catch (e) {
+        console.log("No se pudo cargar config.json", e);
+      }
+
+      const conf = state.config || {};
+      const title = conf.tituloPagina || studioName;
+      document.title = title;
+      
+      const mainTitle = document.getElementById('mainTitle');
+      if (mainTitle) mainTitle.textContent = title;
+      const topTitle = document.getElementById('topTitle');
+      if (topTitle) topTitle.textContent = title;
+
+      if (conf.descripcionNegocio) {
+        const mainDesc = document.getElementById('mainDesc');
+        if (mainDesc) mainDesc.textContent = conf.descripcionNegocio;
+      }
+      if (conf.textoAyuda) {
+        const mainHint = document.getElementById('mainHint');
+        if (mainHint) mainHint.textContent = conf.textoAyuda;
+      }
+
+      // Enlazar imágenes de marca (ahora cargan desde el túnel)
+      const tParam = '?t=' + Date.now();
+      const bImg = document.getElementById('appBanner');
+      if(bImg) bImg.src = configBaseURL + '/resources/banner.jpg' + tParam;
+      const lImg = document.getElementById('appLogo');
+      if(lImg) lImg.src = configBaseURL + '/resources/logo.png' + tParam;
+      const tImg = document.getElementById('topLogo');
+      if(tImg) tImg.src = configBaseURL + '/resources/logo.png' + tParam;
+
+      // Dynamic Theme
+      const savedTheme = localStorage.getItem('keypic_theme');
+      let isDark = false;
+      if (savedTheme) {
+        isDark = savedTheme === 'oscuro';
+      } else if (state.config && state.config.temaPorDefecto === 'oscuro') {
+        isDark = true;
+      }
+      installDynamicTheme(isDark);
+
+      // Solo dígitos
+      els.q.addEventListener('input', function(){
+        const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+      });
+      els.go.addEventListener('click', onSearch);
+      els.q.addEventListener('keydown', (e)=>{ if(e.key==='Enter') onSearch(); });
+
+      // Theme toggle
+      const toggleTheme = () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const newDark = !isDark;
+        installDynamicTheme(newDark);
+        localStorage.setItem('keypic_theme', newDark ? 'oscuro' : 'claro');
+      };
+      els.themeToggle?.addEventListener('click', toggleTheme);
+      document.getElementById('themeToggleGrid')?.addEventListener('click', toggleTheme);
+
+      // Clear selection button
+      document.getElementById('clearSelectionBtn')?.addEventListener('click', () => {
+        state.picked.clear();
+        updateSelInfo();
+        els.grid.querySelectorAll('.card').forEach(c => {
+          c.dataset.picked = 'false';
+          const b = c.querySelector('.pick');
+          if (b) {
+            b.setAttribute('aria-pressed', 'false');
+            b.title = 'Seleccionar';
+          }
+        });
+      });
+
+      // Top search (AppBar)
+      const qTop = document.getElementById('qTop');
+      const goTop = document.getElementById('goTop');
+      qTop?.addEventListener('input', function(){
+        const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+      });
+      goTop?.addEventListener('click', ()=>{ if(qTop.value) search(qTop.value.trim(), true); });
+      document.getElementById('searchIconBtn')?.addEventListener('click', ()=>{ if(qTop && qTop.value) search(qTop.value.trim(), true); });
+      qTop?.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && qTop.value) search(qTop.value.trim(), true); });
+
+      // Menús de recientes
+      attachRecentMenu(els.recentHomeBtn, els.histHome, els.q);
+      attachRecentMenu(els.recentTopBtn, els.histTop, qTop);
+
+      // Copiar/descargar
+      els.copySel?.addEventListener('click', copySelection);
+      els.dlSel?.addEventListener('click', downloadLinkZip);
+      els.dlSelDirect?.addEventListener('click', downloadSelectionDirect);
+      els.dlSelZip?.addEventListener('click', downloadSelectionZip);
+
+      // Share box
+      els.copyAgain?.addEventListener('click', async ()=>{
+        const ok = await copyText(els.shareInput.value);
+        toast(ok ? 'Enlace copiado' : 'No se pudo copiar.');
+      });
+
+      // Viewer events
+      els.vClose.addEventListener('click', closeViewer);
+      els.vPrev.addEventListener('click', ()=> nav(-1));
+      els.vNext.addEventListener('click', ()=> nav(1));
+      els.vStage.addEventListener('click', onStageClick); // click en bordes para navegar
+      els.vPick.addEventListener('click', togglePickFromViewer);
+      els.vDl.addEventListener('click', downloadCurrentViewerPhoto);
+      window.addEventListener('keydown', onKey);
+
+      // Bloquear clic derecho (context menu) en toda la web para proteger las fotos
+      document.addEventListener('contextmenu', e => e.preventDefault());
+
+      // Bloquear pinch-to-zoom (multitouch) en toda la web en móviles
+      document.addEventListener('touchmove', e => {
+        if (e.touches.length > 1) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      // Bloquear Ctrl + Rueda de ratón (zoom de navegador) en toda la web en PC
+      document.addEventListener('wheel', e => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      // Bloquear Ctrl + (+) / (-) / (0) (atajos de zoom de navegador) en toda la web en PC
+      window.addEventListener('keydown', e => {
+        if (e.ctrlKey && (e.key === '=' || e.key === '-' || e.key === '0' || e.key === '+' || e.code === 'NumpadAdd' || e.code === 'NumpadSubtract')) {
+          e.preventDefault();
+        }
+      });
+
+      // Ripple global
+      document.addEventListener('pointerdown', e=>{
+        const el = e.target.closest('.btn, .card');
+        if(!el) return;
+        const r = document.createElement('span');
+        r.className = 'ripple';
+        const rect = el.getBoundingClientRect();
+        r.style.left = `${e.clientX - rect.left}px`;
+        r.style.top = `${e.clientY - rect.top}px`;
+        el.appendChild(r);
+        setTimeout(()=> r.remove(), 600);
+      }, { passive:true });
+
+      // Rellenar datos
+      fillHints(state.data);
+      renderHomeBackground(state.data);
+
+      // Preparar historial inicial (si existe)
+      updateHistoryMenus();
+
+      // Enrutado simple por query
+      routeFromURL();
+      window.addEventListener('popstate', routeFromURL);
+
+      // Service Worker para caché de imágenes
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      }
+
+      // Cerrar menús si clic afuera
+      document.addEventListener('click', (e)=>{
+        if(!e.target.closest('.history-pop, [aria-controls="histHome"], [aria-controls="histTop"]')){
+          hideHistoryMenus();
+        }
+      });
+
+      // Relayout en resize
+      window.addEventListener('resize', debounce(()=>{
+        relayoutGrid(els.grid);
+        relayoutGrid(els.gridLink);
+      }, 120));
+
+      // Iniciar monitoreo continuo de conexión (solo si no es modo demo)
+      if (configBaseURL !== '.') {
+        startConnectionMonitor(contactFallback);
+      }
+    }
+
+    function showOfflineScreen(message) {
+      // Ocultar absolutamente todas las secciones de pantalla para que la web quede limpia
+      document.querySelectorAll('#screen-splash, #screen-home, #screen-grid, #screen-link, #screen-offline').forEach(el => el.classList.add('hidden'));
+      els.overlay.classList.remove('show');
+      els.overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      
+      const off = document.getElementById('screen-offline');
+      if (off) {
+        off.classList.remove('hidden');
+        const title = off.querySelector('h2');
+        if (title) title.textContent = 'Servidor Fuera de Línea';
+        const desc = off.querySelector('p');
+        if (desc) desc.textContent = 'La galería no está disponible temporalmente porque el servidor del fotógrafo está apagado o fuera de red.';
+        const offMsg = document.getElementById('offlineContact');
+        if (offMsg) {
+          offMsg.innerHTML = message;
+        }
+      }
+    }
+
+    function startConnectionMonitor(contact) {
+      if (state.apiBase && state.apiBase !== '.') {
+        setInterval(async () => {
+          try {
+            // Ping ligero HEAD para comprobar estado
+            const res = await fetch(state.apiBase + '/api/gallery?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+            if (!res.ok) throw new Error();
+            
+            // Si regresa la conexión y estaba offline, recargar limpio
+            const off = document.getElementById('screen-offline');
+            if (off && !off.classList.contains('hidden')) {
+              location.reload();
+            }
+          } catch (e) {
+            showOfflineScreen(contact 
+              ? 'Por favor, verifica tu conexión a internet o comunícate con tu fotógrafo: <br><b style="color:var(--brand)">' + contact + '</b>' 
+              : 'Por favor, verifica tu conexión a internet o espera a que el fotógrafo vuelva a estar en línea.');
+          }
+        }, 5000);
+      }
+    }
+
+    function setScreen(name){
+      Object.values(screens).forEach(s => s.classList.add('hidden'));
+      screens[name].classList.remove('hidden');
+      // Ocultar caja de compartir fuera del grid
+      if(name !== 'grid') els.shareBox?.classList.add('hidden');
+
+      // Ocultar botón de tema flotante fuera de home en móviles para simplificar, pero mantenerlo en PC
+      if(els.themeToggle) {
+        const isMobile = window.innerWidth <= 600;
+        if (isMobile) {
+          els.themeToggle.style.display = (name === 'home') ? 'flex' : 'none';
+        } else {
+          els.themeToggle.style.display = 'flex';
+        }
+      }
+
+      // Relayout cuando se muestra una pantalla con grid visible
+      if(name === 'grid') requestAnimationFrame(()=> relayoutGrid(els.grid));
+      if(name === 'link') requestAnimationFrame(()=> relayoutGrid(els.gridLink));
+    }
+
+    async function loadGallery(apiBase){
+      if(apiBase && apiBase !== '.'){
+        try{
+          const res = await fetch(apiBase + '/api/gallery?t=' + Date.now(), { cache: 'no-store' });
+          if(!res.ok) throw new Error('API request failed');
+          const data = await res.json();
+          if(data.base){
+             if(data.base.photos && !data.base.photos.startsWith('http')) data.base.photos = apiBase + '/' + data.base.photos.replace(/^\.\//,'');
+             if(data.base.thumbs && !data.base.thumbs.startsWith('http')) data.base.thumbs = apiBase + '/' + data.base.thumbs.replace(/^\.\//,'');
+          }
+          return data;
+        }catch(e){
+          console.warn("Fallo fetch API", e);
+          throw e;
+        }
+      }
+
+      // 1) intentar externo local
+      for(const url of ['./gallery.json','./data/gallery.json']){
+        try{
+          const res = await fetch(url, { cache: 'no-store' });
+          if(res.ok) return await res.json();
+        }catch{}
+      }
+      // 2) fallback embebido
+      const inline = document.getElementById('__GALLERY__');
+      if(inline?.textContent?.trim()){
+        try{ return JSON.parse(inline.textContent); }catch{}
+      }
+      return { base:{ photos:'./photos/', thumbs:'./thumbs/' }, albums:[] };
+    }
+
+    function fillHints(data){
+      if(!els.hints) return;
+      els.hints.innerHTML = (data.albums||[]).map(a=>`<option value="${a.id}"></option>`).join('');
+      els.q.setAttribute('list','hintList');
+      const qTop = document.getElementById('qTop');
+      qTop?.setAttribute('list','hintList');
+    }
+
+    function thumbPath(folder, name, baseThumbs){
+      if (baseThumbs && baseThumbs.includes('picsum.photos')) {
+        return {
+          src: `${baseThumbs}${folder}_${name}/400/300`
+        };
+      }
+      const i = name.lastIndexOf('.');
+      const b = i>=0 ? name.slice(0,i) : name;
+      const tbase = (baseThumbs||'./thumbs/').replace(/\/+$/,'') + '/' + encodeURIComponent(folder) + '/' + encodeURIComponent(b);
+      return {
+        src: `${tbase}-w400.webp`
+      };
+    }
+
+    function joinURL(...parts){
+      const s = parts.map(p => String(p).replace(/(^\/+|\/+$)/g,'')).filter(Boolean).join('/');
+      if (s.includes('picsum.photos')) {
+        return `${parts[0]}${parts[1]}_${parts[2]}/1600/1200`;
+      }
+      if(s.startsWith('http')) return s;
+      return './' + s;
+    }
+
+    function onSearch(){
+      const id = els.q.value.trim();
+      if(!id){ toast('Escribe una cédula'); return; }
+      search(id, true);
+    }
+
+    function routeFromURL(){
+      const p = new URLSearchParams(location.search);
+      const ced = p.get('cedula');
+      const selParam = p.get('sel');
+      const names = decodeSel(selParam);
+
+      if(ced && names.length){
+        openLinkView(ced, names, false);
+      }else if(ced){
+        search(ced, false);
+      }else{
+        setScreen('home');
+      }
+    }
+
+    async function search(id, pushHistoryFlag){
+      const a = (state.data.albums||[]).find(x => x.id === id);
+      if(!a){ showErr('No encontramos esa cédula.'); setScreen('home'); return; }
+      clearErr();
+
+      state.album = a;
+      const baseP = state.data.base?.photos || './photos/';
+      const baseT = state.data.base?.thumbs || './thumbs/';
+
+      state.files = a.files.slice();
+      state.full  = state.files.map(n => joinURL(baseP, id, n));
+      state.thumbs = state.files.map(n => thumbPath(id, n, baseT));
+      state.picked.clear();
+
+      els.ttl.textContent = `Cédula ${id} • ${state.files.length} foto${state.files.length===1?'':'s'}`;
+
+      renderGrid();
+      setScreen('grid');
+
+      if(pushHistoryFlag){
+        const u = new URL(location.href);
+         u.searchParams.set('cedula', id);
+        history.pushState({}, '', u);
+      }
+      rememberCed(id);
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    function renderGrid(){
+      els.grid.innerHTML = '';
+      if(!state.files.length){
+        showErr('Este álbum no tiene fotos.');
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      state.files.forEach((name, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.i = String(i);
+        card.dataset.picked = 'false';
+
+        const t = state.thumbs[i];
+
+        const skel = document.createElement('div');
+        skel.className = 'skel';
+
+        const img = document.createElement('img');
+        img.decoding = 'async';
+        img.alt = `Foto ${i+1}`;
+        img.setAttribute('fetchpriority','low');
+        img.dataset.src = t.src;
+        if(t.srcset) img.dataset.srcset = t.srcset;
+        if(t.sizes) img.dataset.sizes = t.sizes;
+        img.addEventListener('error', () => { img.removeAttribute('srcset'); img.src = state.full[i]; });
+
+        observeLazy(img, card, els.grid);
+
+        const pick = document.createElement('button');
+        pick.className = 'pick';
+        pick.type = 'button';
+        pick.title = 'Seleccionar';
+        pick.setAttribute('aria-pressed','false');
+        pick.innerHTML = '<svg class="ic" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
+        pick.addEventListener('click', (e)=>{ e.stopPropagation(); togglePick(i, card); });
+
+        const badge = document.createElement('div');
+        badge.className = 'chip';
+        badge.textContent = 'Seleccionada';
+
+        card.addEventListener('click', () => openViewerAt('grid', i));
+        card.append(img, skel, pick, badge);
+        frag.appendChild(card);
+      });
+      els.grid.appendChild(frag);
+      updateSelInfo();
+
+      // Intento de layout inicial (por si hay imágenes en caché)
+      requestAnimationFrame(()=> relayoutGrid(els.grid));
+    }
+
+    function observeLazy(img, card, gridEl){
+      if(!ro){
+        ro = new ResizeObserver(entries => {
+          for(let e of entries){
+            const el = e.target;
+            const parent = el.closest('.card');
+            const g = parent?.parentElement;
+            if(parent && g) fitCardToGrid(parent, g);
+          }
+        });
+      }
+      ro.observe(img);
+      if(!io){
+        io = new IntersectionObserver(async entries=>{
+          for(const e of entries){
+            if(!e.isIntersecting) continue;
+            const el = e.target; io.unobserve(el);
+            const parentCard = el.closest('.card');
+            const grid = lazyCtx.get(el);
+
+            try{
+              if(el.dataset.src) el.src = el.dataset.src;
+              if(el.dataset.srcset && el.dataset.srcset !== 'undefined') el.srcset = el.dataset.srcset;
+              if(el.dataset.sizes && el.dataset.sizes !== 'undefined') el.sizes = el.dataset.sizes;
+              await (el.decode?.() || new Promise(r=> el.onload = r));
+              parentCard?.setAttribute('data-loaded','true');
+            }catch{
+              parentCard?.setAttribute('data-loaded','true');
+            }finally{
+              if(parentCard && grid) fitCardToGrid(parentCard, grid);
+            }
+          }
+        },{ rootMargin: '600px 0px' });
+      }
+      lazyCtx.set(img, gridEl);
+      io.observe(img);
+    }
+
+    function togglePick(i, cardEl){
+      const willPick = !state.picked.has(i);
+      if(willPick){
+        state.picked.add(i);
+        cardEl.dataset.picked = 'true';
+      }else{
+        state.picked.delete(i);
+        cardEl.dataset.picked = 'false';
+      }
+      const btn = cardEl.querySelector('.pick');
+      if(btn){
+        btn.setAttribute('aria-pressed', willPick ? 'true' : 'false');
+        btn.title = willPick ? 'Quitar de selección' : 'Seleccionar';
+      }
+      updateSelInfo();
+      if(state.view.source==='grid' && state.view.idx===i) syncViewerPickButton();
+    }
+
+    function updateSelInfo(){
+      const n = state.picked.size;
+      const normalHeader = document.getElementById('normalHeader');
+      const selectionHeader = document.getElementById('selectionHeader');
+
+      if (normalHeader && selectionHeader) {
+        if (n > 0) {
+          normalHeader.classList.add('hidden');
+          selectionHeader.classList.remove('hidden');
+        } else {
+          normalHeader.classList.remove('hidden');
+          selectionHeader.classList.add('hidden');
+          els.shareBox?.classList.add('hidden');
+        }
+      }
+
+      els.selCount.textContent = String(n);
+    }
+
+    async function copySelection(){
+      if(!state.album){ toast('Primero busca una cédula.'); return; }
+      const names = [...state.picked].sort((a,b)=>a-b).map(i => state.files[i]);
+      if(!names.length){ toast('No has seleccionado fotos.'); return; }
+      const u = new URL(location.href);
+      
+      u.searchParams.set('cedula', state.album.id);
+      u.searchParams.set('sel', encodeSel(names));
+      const link = u.toString();
+
+      showShareBox(link);
+
+      const ok = await copyText(link);
+      toast(ok ? 'Enlace copiado' : 'No se pudo copiar. Copia manualmente.');
+    }
+
+    // Vista de enlace compartido
+    function openLinkView(ced, names, push){
+      const album = (state.data.albums||[]).find(x => x.id === ced);
+      const baseP = state.data.base?.photos || './photos/';
+      const baseT = state.data.base?.thumbs || './thumbs/';
+      let list = names;
+
+      if(album){
+        const set = new Set(album.files);
+        list = names.filter(n => set.has(n));
+      }
+
+      state.linkCed = ced;
+      state.linkNames = list;
+      state.linkUrls = list.map(n => joinURL(baseP, ced, n));
+      state.linkThumbs = list.map(n => thumbPath(ced, n, baseT));
+
+      els.linkCed.textContent = `Cédula ${ced}`;
+      renderLinkGrid();
+
+      setScreen('link');
+
+      if(push){
+        const u = new URL(location.href);
+        
+        u.searchParams.set('cedula', ced);
+        if(list.length) u.searchParams.set('sel', encodeSel(list));
+        history.pushState({}, '', u);
+      }
+
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    function renderLinkGrid(){
+      const n = state.linkNames.length;
+      els.emptyLink.classList.toggle('hidden', n > 0);
+      els.gridLink.innerHTML = '';
+      if(!n) return;
+
+      const frag = document.createDocumentFragment();
+      for(let i=0;i<n;i++){
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const skel = document.createElement('div');
+        skel.className = 'skel';
+
+        const t = state.linkThumbs[i];
+        const img = document.createElement('img');
+        img.decoding='async';
+        img.alt = `Foto seleccionada ${i+1}`;
+        img.setAttribute('fetchpriority','low');
+        img.dataset.src = t.src;
+        if(t.srcset) img.dataset.srcset = t.srcset;
+        if(t.sizes) img.dataset.sizes = t.sizes;
+        img.addEventListener('error', ()=>{ img.removeAttribute('srcset'); img.src = state.linkUrls[i]; });
+        observeLazy(img, card, els.gridLink);
+
+        card.addEventListener('click', () => openViewerAt('link', i));
+        card.append(img, skel);
+        frag.appendChild(card);
+      }
+      els.gridLink.appendChild(frag);
+
+      requestAnimationFrame(()=> relayoutGrid(els.gridLink));
+    }
+
+    async function downloadLinkZip(){
+      const ced = state.linkCed || 'cedula';
+      const names = state.linkNames || [];
+      const urls = state.linkUrls || [];
+      if(!names.length){ toast('No hay fotos para descargar.'); return; }
+      const JSZip = await loadJSZip().catch(()=>null);
+      if(!JSZip){ toast('No se pudo cargar el generador de ZIP.'); return; }
+
+      const zip = new JSZip();
+      for(let i=0;i<urls.length;i++){
+        try{
+          const res = await fetch(urls[i]);
+          const blob = await res.blob();
+          zip.file(names[i] || `foto-${i+1}.jpg`, blob);
+        }catch{}
+      }
+      const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+      downloadBlob(blob, `${ced}.zip`);
+    }
+
+    async function downloadSelectionZip(){
+      if(!state.album){ toast('Primero busca una cédula.'); return; }
+      const pickedArr = [...state.picked].sort((a,b)=>a-b);
+      if(!pickedArr.length){ toast('No has seleccionado fotos.'); return; }
+      const JSZip = await loadJSZip().catch(()=>null);
+      if(!JSZip){ toast('No se pudo cargar el generador de ZIP.'); return; }
+      const zip = new JSZip();
+      for(let idx of pickedArr){
+        try{
+          const res = await fetch(state.full[idx]);
+          const blob = await res.blob();
+          zip.file(state.files[idx] || `foto-${idx}.jpg`, blob);
+        }catch{}
+      }
+      const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+      downloadBlob(blob, `${state.album.id}-seleccion.zip`);
+    }
+
+    async function downloadSelectionDirect(){
+      if(!state.album){ toast('Primero busca una cédula.'); return; }
+      const pickedArr = [...state.picked].sort((a,b)=>a-b);
+      if(!pickedArr.length){ toast('No has seleccionado fotos.'); return; }
+      toast(`Descargando ${pickedArr.length} fotos...`);
+      for(let idx of pickedArr){
+        try{
+          const res = await fetch(state.full[idx]);
+          const blob = await res.blob();
+          downloadBlob(blob, state.files[idx] || `foto-${idx}.jpg`);
+          await new Promise(r => setTimeout(r, 600)); // Pausa de 600ms
+        }catch{}
+      }
+    }
+
+    async function downloadCurrentViewerPhoto(){
+      const { urls, names } = currentArrays();
+      const i = state.view.idx;
+      if(!urls[i]) return;
+      try{
+        toast('Descargando...');
+        const res = await fetch(urls[i]);
+        const blob = await res.blob();
+        downloadBlob(blob, names[i] || `foto.jpg`);
+      }catch{
+        toast('Error al descargar la foto.');
+      }
+    }
+
+    function loadJSZip(){
+      if(window.JSZip) return Promise.resolve(window.JSZip);
+      return new Promise((resolve,reject)=>{
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        s.onload = ()=>resolve(window.JSZip);
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    function downloadBlob(blob, name){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    }
+
+    function showErr(msg){ els.err.textContent = msg; els.err.classList.remove('hidden'); }
+    function clearErr(){ els.err.textContent = ''; els.err.classList.add('hidden'); }
+
+    function toast(msg){
+      const t = els.toast;
+      t.textContent = msg;
+      t.style.display = 'block';
+      t.style.opacity = '0';
+      requestAnimationFrame(()=> t.style.opacity = '1');
+      setTimeout(()=>{
+        t.style.opacity = '0';
+        setTimeout(()=> t.style.display = 'none', 220);
+      }, 1600);
+    }
+
+    function encodeSel(arr){ return arr.map(encodeURIComponent).join(','); }
+    function decodeSel(param){
+      if(!param) return [];
+      return param.split(',').map(s=>{ try{ return decodeURIComponent(s); } catch{ return s; } }).filter(Boolean);
+    }
+
+    function showShareBox(link){
+      if(!els.shareBox) return;
+      els.shareInput.value = link;
+      els.shareBox.classList.remove('hidden');
+      els.shareInput.focus({ preventScroll:true });
+      els.shareInput.select();
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch{
+        try{
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly','');
+          ta.style.position = 'fixed';
+          ta.style.top = '-1000px';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return !!ok;
+        }catch{
+          return false;
+        }
+      }
+    }
+
+    /* ========== Visor (lightbox) ========== */
+    function openViewerAt(source, idx){
+      state.view.source = source;
+      state.view.idx = idx || 0;
+      updateViewer();
+      els.overlay.classList.add('show');
+      els.overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeViewer(){
+      els.overlay.classList.remove('show');
+      els.overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function currentArrays(){
+      if(state.view.source === 'link'){
+        return { names: state.linkNames, urls: state.linkUrls, thumbs: state.linkThumbs, ced: state.linkCed };
+      }
+      return { names: state.files, urls: state.full, thumbs: state.thumbs, ced: state.album?.id || '' };
+    }
+
+    function clampIndex(i, len){
+      if(len<=0) return 0;
+      return (i + len) % len;
+    }
+
+    function onKey(e){
+      if(els.overlay.getAttribute('aria-hidden') === 'true') return;
+      if(e.key === 'Escape') return closeViewer();
+      if(e.key === 'ArrowRight') return nav(1);
+      if(e.key === 'ArrowLeft') return nav(-1);
+      if(e.key === ' ' || e.key.toLowerCase?.() === 's'){
+        e.preventDefault();
+        togglePickFromViewer();
+      }
+    }
+
+    // Clic en los bordes del stage para navegar (izquierda/ derecha)
+    function onStageClick(e){
+      const rect = els.vStage.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      if(x < rect.width / 2) nav(-1); else nav(1);
+    }
+
+    function syncViewerPickButton(){
+      if(state.view.source !== 'grid') return;
+      const i = state.view.idx;
+      const picked = state.picked.has(i);
+      els.vPick.setAttribute('aria-pressed', picked ? 'true' : 'false');
+      els.vPick.setAttribute('aria-label', picked ? 'Quitar de selección' : 'Agregar a selección');
+      els.vStage.dataset.picked = picked ? 'true' : 'false';
+    }
+
+    function togglePickFromViewer(){
+      if(state.view.source !== 'grid') return;
+      const i = state.view.idx;
+      const card = document.querySelector(`.card[data-i="${i}"]`);
+      if(!card) return;
+      if(state.picked.has(i)){
+        state.picked.delete(i);
+        card.dataset.picked = 'false';
+      }else{
+        state.picked.add(i);
+        card.dataset.picked = 'true';
+      }
+      const btn = card.querySelector('.pick');
+      if(btn){
+        const isPicked = state.picked.has(i);
+        btn.setAttribute('aria-pressed', isPicked ? 'true' : 'false');
+        btn.title = isPicked ? 'Quitar de selección' : 'Seleccionar';
+      }
+      updateSelInfo();
+      syncViewerPickButton();
+    }
+
+    // ========= Precarga robusta + caché del visor =========
+    function cacheDecode(url, priority='high'){
+      if(viewerCache.has(url)) return viewerCache.get(url);
+      const p = new Promise(async (resolve, reject)=>{
+        try{
+          const img = new Image();
+          img.decoding = 'async';
+          if('fetchPriority' in img) img.fetchPriority = priority;
+          img.src = url;
+          await (img.decode?.() || new Promise(r=> img.onload = r));
+          resolve(img);
+        }catch(err){ reject(err); }
+      });
+      viewerCache.set(url, p);
+      if(viewerCache.size > VIEWER_CACHE_LIMIT){
+        const first = viewerCache.keys().next().value;
+        viewerCache.delete(first);
+      }
+      return p;
+    }
+    function prefetch(url){
+      cacheDecode(url, 'low').catch(()=>{});
+    }
+    async function setViewerSource(url){
+      viewerAbort?.abort();
+      const ctrl = new AbortController();
+      viewerAbort = ctrl;
+      els.vStage.setAttribute('data-loading','true');
+      try{
+        await cacheDecode(url, 'high');
+        if(ctrl.signal.aborted) return;
+        els.vImg.onload = null; // Cancel any pending thumbnail onload
+        els.vImg.src = url; // swap tras decode => sin parpadeo
+        els.vImg.style.opacity = '1'; // Mostrar foto original al 100%
+      }finally{
+        els.vStage.removeAttribute('data-loading');
+      }
+    }
+
+    function updateViewer(){
+      const { urls, thumbs } = currentArrays();
+      const i = state.view.idx = clampIndex(state.view.idx, urls.length);
+      if(!urls.length){ closeViewer(); return; }
+
+      // Ocultar imagen anterior instantáneamente sin transición para evitar "fantasmas"
+      els.vImg.style.transition = 'none';
+      els.vImg.style.opacity = '0';
+      els.vImg.offsetHeight; // Forzar repintado inmediato
+      els.vImg.style.transition = ''; // Restaurar la transición CSS
+
+      // Mostrar thumbnail inmediato como placeholder
+      const t = thumbs[i];
+      if(t?.src) {
+        els.vImg.onload = () => {
+          els.vImg.onload = null;
+          // Si todavía se está cargando la original, mostrar el thumb con opacidad
+          if (els.vStage.getAttribute('data-loading') === 'true') {
+            els.vImg.style.opacity = '0.4';
+          }
+        };
+        els.vImg.src = t.src;
+      }
+
+      // Cargar la vista previa de 1600px en lugar de la original de 10MB para que vuele
+      let viewerUrl = urls[i];
+      if (t?.src) {
+        viewerUrl = t.src.replace('-w400.webp', '-w1600.webp');
+      }
+      setViewerSource(viewerUrl);
+
+      // Posición
+      els.vPos.textContent = `${i+1}/${urls.length}`;
+
+      // Botón seleccionar visible solo en 'grid'
+      const isGrid = state.view.source === 'grid';
+      els.vPick.classList.toggle('hidden', !isGrid);
+      if(isGrid){
+        syncViewerPickButton();
+      }else{
+        els.vStage.dataset.picked = 'false';
+        els.vPick.setAttribute('aria-pressed','false');
+      }
+
+      // Precarga vecinos
+      const a = (i + 1) % urls.length;
+      const b = (i - 1 + urls.length) % urls.length;
+      prefetch(urls[a]); prefetch(urls[b]);
+    }
+
+    function nav(delta){
+      const { urls } = currentArrays();
+      if(!urls.length) return;
+      state.view.idx = clampIndex(state.view.idx + delta, urls.length);
+      updateViewer();
+    }
+
+    /* ========== Fondo: collage en pantalla de inicio ========== */
+    function renderHomeBackground(manifest){
+      const root = els.bg;
+      if(!root) return;
+      const items = pickBackgrounds(manifest, 30);
+      root.innerHTML = '';
+      const frag = document.createDocumentFragment();
+      items.forEach(it=>{
+        const img = new Image();
+        img.loading = 'lazy'; img.decoding = 'async';
+        img.src = it.thumb; img.alt = '';
+        img.onerror = () => { img.removeAttribute('srcset'); img.src = it.full; };
+        img.onload = () => { img.style.opacity = 1; };
+        frag.appendChild(img);
+      });
+      root.appendChild(frag);
+    }
+    function pickBackgrounds(manifest, max = 30){
+      const albums = manifest.albums || [];
+      const out = [];
+      let i = 0;
+      while(out.length < max && i < 1000){
+        i++;
+        const a = albums[Math.floor(Math.random()*albums.length)];
+        if(!a || !a.files?.length) continue;
+        const f = a.files[Math.floor(Math.random()*a.files.length)];
+        out.push({
+          thumb: thumbPath(a.id, f, manifest.base?.thumbs || './thumbs/').src,
+          full: joinURL(manifest.base?.photos || './photos/', a.id, f)
+        });
+      }
+      return out;
+    }
+
+    /* ===== Historial de cédulas ===== */
+    function getHistory(){
+      try{
+        const arr = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+        return Array.isArray(arr) ? arr.filter(x => typeof x === 'string') : [];
+      }catch{ return []; }
+    }
+    function saveHistory(arr){
+      try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch{}
+    }
+    function rememberCed(id){
+      if(!id) return;
+      let arr = getHistory();
+      arr = [id, ...arr.filter(x => x !== id)];
+      if(arr.length > 8) arr = arr.slice(0, 8);
+      saveHistory(arr);
+      updateHistoryMenus();
+    }
+    function updateHistoryMenus(){
+      fillHistoryMenu(els.histHome, els.q);
+      const qTop = document.getElementById('qTop');
+      fillHistoryMenu(els.histTop, qTop);
+    }
+    function fillHistoryMenu(menuEl, inputEl){
+      if(!menuEl) return;
+      const items = getHistory();
+      if(!items.length){
+        menuEl.innerHTML = '<div class="empty">Sin recientes</div>';
+        return;
+      }
+      menuEl.innerHTML = items.map(id => `<button type="button" class="h-item" data-id="${id}">${id}</button>`).join('');
+      menuEl.querySelectorAll('.h-item').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          if(inputEl){ inputEl.value = btn.dataset.id || ''; inputEl.focus(); }
+          hideHistoryMenus();
+        });
+      });
+    }
+    function attachRecentMenu(btn, menu, input){
+      if(!btn || !menu) return;
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        hideHistoryMenus();
+        if(!isOpen){
+          menu.classList.remove('hidden');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+    function hideHistoryMenus(){
+      [els.histHome, els.histTop].forEach(m=> m?.classList.add('hidden'));
+      [els.recentHomeBtn, els.recentTopBtn].forEach(b=> b?.setAttribute('aria-expanded','false'));
+    }
+
+    
+      const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+      if (mobileSearchBtn) {
+        mobileSearchBtn.addEventListener('click', () => {
+          const qTop = document.getElementById('qTop');
+          const field = qTop.closest('.field');
+          field.classList.toggle('expanded');
+          if (field.classList.contains('expanded')) qTop.focus();
+        });
+      }
+
+    // ===== Material You Dynamic Color =====
+    const PROMO_SEED = '#2563eb';
+    async function installDynamicTheme(isDark = false){
+      try{
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        if (window.els && els.icSun && els.icMoon) {
+          els.icSun.classList.toggle('hidden', isDark);
+          els.icMoon.classList.toggle('hidden', !isDark);
+        }
+        const { argbFromHex, themeFromSourceColor, applyTheme } = await import('https://cdn.jsdelivr.net/npm/@material/material-color-utilities@0.3.0/+esm');
+        const theme = themeFromSourceColor(argbFromHex(PROMO_SEED));
+        applyTheme(theme, { target: document.documentElement, dark: isDark });
+
+        const css = getComputedStyle(document.documentElement);
+        const get = n => css.getPropertyValue(n).trim();
+        document.documentElement.style.setProperty('--m3-primary', get('--md-sys-color-primary'));
+        document.documentElement.style.setProperty('--m3-on-primary', get('--md-sys-color-on-primary'));
+        document.documentElement.style.setProperty('--m3-secondary', get('--md-sys-color-secondary'));
+        document.documentElement.style.setProperty('--m3-tertiary', get('--md-sys-color-tertiary'));
+        document.documentElement.style.setProperty('--m3-surface', get('--md-sys-color-surface'));
+        document.documentElement.style.setProperty('--m3-on-surface', get('--md-sys-color-on-surface'));
+        document.documentElement.style.setProperty('--m3-outline', get('--md-sys-color-outline-variant') || get('--md-sys-color-outline'));
+
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if(meta) meta.setAttribute('content', isDark ? '#000000' : get('--md-sys-color-surface'));
+      }catch{}
+    }
+  </script>
+</body>
+</html>
