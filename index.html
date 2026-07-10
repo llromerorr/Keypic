@@ -623,7 +623,7 @@
         <span class="ic-left">
           <svg class="ic" viewBox="0 0 24 17"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </span>
-        <input id="q" class="input" inputmode="numeric" pattern="\d*" placeholder="Ej: 35785214" autocomplete="off">
+        <input id="q" class="input" inputmode="text" pattern="[a-zA-Z0-9_-]*" placeholder="Ej: 35785214 o código" autocomplete="off">
         
         <!-- <button id="recentHomeBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histHome" title="Cédulas recientes">
           <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -677,7 +677,7 @@
               <button id="searchIconBtn" class="ic-left" type="button" aria-label="Buscar" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center; width:20px; height:20px; z-index:2; outline:none;">
                 <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
               </button>
-              <input id="qTop" class="input" inputmode="numeric" pattern="\d*" placeholder="Buscar cédula">
+              <input id="qTop" class="input" inputmode="text" pattern="[a-zA-Z0-9_-]*" placeholder="Cédula o código">
               <button id="recentTopBtn" class="btn icon" aria-label="Ver cédulas recientes" aria-haspopup="menu" aria-expanded="false" aria-controls="histTop" title="Cédulas recientes">
                 <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
               </button>
@@ -1154,9 +1154,9 @@
       }
       installDynamicTheme(isDark);
 
-      // Solo dígitos
+      // Permitir caracteres alfanuméricos, guiones y guiones bajos (código/cédula)
       els.q.addEventListener('input', function(){
-        const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+        const d = this.value.toLowerCase().replace(/[^a-z0-9_-]/g,''); if (this.value !== d) this.value = d;
         clearErr();
       });
       els.go.addEventListener('click', onSearch);
@@ -1211,7 +1211,7 @@
       const qTop = document.getElementById('qTop');
       const goTop = document.getElementById('goTop');
       qTop?.addEventListener('input', function(){
-        const d = this.value.replace(/\D/g,''); if (this.value !== d) this.value = d;
+        const d = this.value.toLowerCase().replace(/[^a-z0-9_-]/g,''); if (this.value !== d) this.value = d;
         clearErr();
       });
       goTop?.addEventListener('click', ()=>{ if(qTop.value) search(qTop.value.trim(), true); });
@@ -1473,30 +1473,32 @@
     }
 
     async function search(id, pushHistoryFlag){
-      const a = (state.data.albums||[]).find(x => x.id === id);
-      if(!a){ showErr('No encontramos esa cédula.'); setScreen('home'); return; }
+      const searchId = id.trim().toLowerCase();
+      const a = (state.data.albums||[]).find(x => x.id.toLowerCase() === searchId);
+      if(!a){ showErr('No encontramos esa cédula o código.'); setScreen('home'); return; }
       clearErr();
 
       state.album = a;
+      const albumID = a.id; // Mantener la capitalización original de la carpeta física
       const baseP = state.data.base?.photos || './photos/';
       const baseT = state.data.base?.thumbs || './thumbs/';
 
       state.files = a.files.slice();
-      state.full  = state.files.map(n => joinURL(baseP, id, n));
-      state.thumbs = state.files.map(n => thumbPath(id, n, baseT));
+      state.full  = state.files.map(n => joinURL(baseP, albumID, n));
+      state.thumbs = state.files.map(n => thumbPath(albumID, n, baseT));
       state.picked.clear();
 
-      els.ttl.textContent = `Cédula ${id} • ${state.files.length} foto${state.files.length===1?'':'s'}`;
+      els.ttl.textContent = `Código: ${albumID} • ${state.files.length} foto${state.files.length===1?'':'s'}`;
 
       renderGrid();
       setScreen('grid');
 
       if(pushHistoryFlag){
         const u = new URL(location.href);
-         u.searchParams.set('cedula', id);
+        u.searchParams.set('cedula', albumID);
         history.pushState({}, '', u);
       }
-      rememberCed(id);
+      rememberCed(albumID);
       window.scrollTo({top:0, behavior:'smooth'});
     }
 
@@ -1645,7 +1647,9 @@
 
     // Vista de enlace compartido
     function openLinkView(ced, names, push){
-      const album = (state.data.albums||[]).find(x => x.id === ced);
+      const a = (state.data.albums||[]).find(x => x.id.toLowerCase() === ced.toLowerCase());
+      const album = a;
+      const albumID = a ? a.id : ced; // Mantener la capitalización original si se encontró
       const baseP = state.data.base?.photos || './photos/';
       const baseT = state.data.base?.thumbs || './thumbs/';
       let list = names;
@@ -1655,20 +1659,19 @@
         list = names.filter(n => set.has(n));
       }
 
-      state.linkCed = ced;
+      state.linkCed = albumID;
       state.linkNames = list;
-      state.linkUrls = list.map(n => joinURL(baseP, ced, n));
-      state.linkThumbs = list.map(n => thumbPath(ced, n, baseT));
+      state.linkUrls = list.map(n => joinURL(baseP, albumID, n));
+      state.linkThumbs = list.map(n => thumbPath(albumID, n, baseT));
 
-      els.linkCed.textContent = `Cédula ${ced}`;
+      els.linkCed.textContent = `Código: ${albumID}`;
       renderLinkGrid();
 
       setScreen('link');
 
       if(push){
         const u = new URL(location.href);
-        
-        u.searchParams.set('cedula', ced);
+        u.searchParams.set('cedula', albumID);
         if(list.length) u.searchParams.set('sel', encodeSel(list));
         history.pushState({}, '', u);
       }
